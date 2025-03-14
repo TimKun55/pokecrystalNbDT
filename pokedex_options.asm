@@ -3,6 +3,10 @@ DEF USE_GEN3_STYLE_TYPE_GFX EQU TRUE
 	; if FALSE, uses 4-letter shorthand for Types
 	; see 'engine\pokedex\pokedex2.asm'
 
+	; Want to obfuscate unseen pokemon from the Evolution chart Page?
+ DEF EVO_HIDE_UNSEEN EQU TRUE
+ 	; will still show evolution methods and requirements, but not name or icon
+
 ; Using custom Evolution Methods?
  	; see 'engine\pokedex\pokedex_evolution_page.asm'
  	; Currently supports:

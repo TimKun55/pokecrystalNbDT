@@ -37,16 +37,35 @@ DisplayDexMonEvos:
 .dont_arrow_stage1	
 	hlcoord 6, 2
 	call EVO_sethlcoord
-	call GetPokemonName
+
+	; will be overwritten if we havent seen mon, and the option is enabled
+ 	call GetPokemonName ; uses wNamedObjectIndex
+IF EVO_HIDE_UNSEEN == TRUE
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen_1
+ 	ld de, EVO_Unseen_Mon_text
+.seen_1	
+ENDC
 	call PlaceString
+
 	ld a, -1
 	ld [wStatsScreenFlags], a
 	call EVO_DrawSpriteBox
-	call EVO_place_CaughtIcon
+
 	hlcoord 6, 2
 	call EVO_sethlcoord
-	call EVO_place_Mon_Types
+	call EVO_place_Mon_Types	
+ 
+IF EVO_HIDE_UNSEEN == TRUE
+ 	call EVO_CheckSeenMon
+ 	jr z, .unseen_no_gfx_2
+ENDC	
+ 	call EVO_place_CaughtIcon
 	call EVO_place_Mon_Icon
+IF EVO_HIDE_UNSEEN == TRUE	
+.unseen_no_gfx_2
+ENDC
+
 	xor a
 	ld [wStatsScreenFlags], a
 	
@@ -127,7 +146,15 @@ DisplayDexMonEvos:
 	ld a, BANK("Evolutions and Attacks")
 	call GetFarByte ; species
 	ld [wNamedObjectIndex], a
-	call GetPokemonName ; uses NamedObjectIndex
+
+	; will be overwritten if we havent seen mon, and the option is enabled
+ 	call GetPokemonName ; uses wNamedObjectIndex
+IF EVO_HIDE_UNSEEN == TRUE
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen_2
+ 	ld de, EVO_Unseen_Mon_text
+.seen_2	
+ENDC
 	call EVO_gethlcoord
 	call PlaceString
 
@@ -146,11 +173,21 @@ DisplayDexMonEvos:
 	pop af ; manner of evo
 
 	call EVO_DrawSpriteBox
-	call EVO_place_CaughtIcon
 	call EVO_place_Mon_Types
+IF EVO_HIDE_UNSEEN == TRUE
+ 	push af
+ 	push bc
+ 	call EVO_CheckSeenMon
+ 	jr z, .unseen_no_gfx_1
+ENDC
+ 	call EVO_place_CaughtIcon
 	call EVO_place_Mon_Icon
+IF EVO_HIDE_UNSEEN == TRUE
+.unseen_no_gfx_1
+ 	pop bc
+ 	pop af
+ENDC
 	call EVO_inchlcoord
-
 ; done printing species
 	pop hl ; manner of evo byte +1
 	pop af ; manner of evo
@@ -1095,30 +1132,63 @@ EVO_Draw_border:
  DEX_EVO_NO_CUSTOM_GFX_PrintType_Short:
  ; Print type a at hl.
  	push hl
+IF EVO_HIDE_UNSEEN == TRUE	
+ 	push af
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen
+ 	pop af ; discarding
+ 	ld a, 18 ; index of ???
+ 	jr .done
+.seen
+ 	pop af
+.done
+ENDC
  	ld hl, .Types
- 	ld bc, 5 ; since each entry is 4 bytes
+ 	ld bc, 4 ; since each entry is 4 bytes
  	call AddNTimes
  	ld d, h
  	ld e, l
  	pop hl
+	inc hl
  	jp PlaceString
  
  .Types
- 	db "NORM@"
- 	db "FIGT@"
- 	db "FLY @"
- 	db "PSN @"
- 	db "GRND@"
- 	db "ROCK@"
- 	db "BUG @"
- 	db "GHST@"
- 	db "STEL@"
- 	db "FIRE@"
- 	db "WATR@"
- 	db "GRAS@"
- 	db "ELEC@"
- 	db "PSY @"
- 	db "ICE @"
- 	db "DRGN@"
- 	db "DARK@"
- ENDC
+	db "NRM@"
+ 	db "FIT@"
+ 	db "FLY@"
+ 	db "PSN@"
+ 	db "GRD@"
+ 	db "RCK@"
+ 	db "BUG@"
+ 	db "GHS@"
+ 	db "STL@"
+ 	db "FIR@"
+ 	db "WAT@"
+ 	db "GRS@"
+ 	db "ELC@"
+ 	db "PSY@"
+ 	db "ICE@"
+ 	db "DRG@"
+ 	db "DRK@"
+ 	db "FAI@"
+ 	db "???@"
+ENDC
+ 
+IF EVO_HIDE_UNSEEN == TRUE
+EVO_CheckSeenMon:
+ 	push de
+ 	push hl
+ 	ld a, [wNamedObjectIndex]
+ 	dec a
+ 	call CheckSeenMon
+ 	pop hl
+ 	pop de
+ 	and a ; 0 means unseen, 1 is seen
+ 	; jr nz, .seen_mon
+ 	; ld de, .EVO_Unseen_Mon_text
+; .seen_mon
+ 	ret
+ 
+EVO_Unseen_Mon_text:
+ 	db "?????@"
+ENDC
