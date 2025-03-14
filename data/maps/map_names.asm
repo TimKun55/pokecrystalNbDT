@@ -570,7 +570,7 @@ Olivine_Map_Name6: ; map_const OLIVINE_GOOD_ROD_HOUSE ;  6
 Olivine_Map_Name7: ; map_const OLIVINE_CAFE ;  7
 	db "OLIVINE CAFE@"
 Olivine_Map_Name8: ; map_const OLIVINE_MART ;  8
-	db "OLIVINE <POKE>MART@"
+	db "OLIVINE #MART@"
 Olivine_Map_Name9: ; map_const ROUTE_38_ECRUTEAK_GATE ;  9
 	db "ROUTE 38 GATE@"
 Olivine_Map_Name10: ; map_const ROUTE_39_BARN ; 10
@@ -597,7 +597,7 @@ Mahogany_Map_Name5: ; map_const ROUTE_42,  ;  5
 Mahogany_Map_Name6: ; map_const ROUTE_44, ;  6
 	db "ROUTE 44@"
 Mahogany_Map_Name7: ; map_const MAHOGANY_TOWN,  ;  7
-	db "MAHOGANY TOWN@"                                           ;  3
+	db "MAHOGANY TOWN@"
 Dungeons_Map_Name1: ; map_const SPROUT_TOWER_1F, ;  1
 	db "SPROUT TOWER 1F@"
 Dungeons_Map_Name2: ; map_const SPROUT_TOWER_2F, ;  2
@@ -693,7 +693,7 @@ Dungeons_Map_Name46: ; map_const OLIVINE_LIGHTHOUSE_5F,; 46
 Dungeons_Map_Name47: ; map_const OLIVINE_LIGHTHOUSE_6F,; 47
 	db "LIGHTHOUSE 6F@"
 Dungeons_Map_Name48: ; map_const MAHOGANY_MART_1F ; 48
-	db "MAHOGANY <POKE>MART@"
+	db "MAHOGANY #MART@"
 Dungeons_Map_Name49: ; map_const TEAM_ROCKET_BASE_B1F,; 49
 	db "ROCKET BASE B1F@"
 Dungeons_Map_Name50: ; map_const TEAM_ROCKET_BASE_B2F,; 50
@@ -729,7 +729,7 @@ Dungeons_Map_Name64: ; map_const ICE_PATH_B2F_BLACKTHORN_SIDE ; 64
 Dungeons_Map_Name65: ; map_const ICE_PATH_B3F,; 65
 	db "ICE PATH B3F@"
 Dungeons_Map_Name66: ; map_const WHIRL_ISLAND_NW ; 66
-	db "WHIRL ISL NW@"
+	db "WHIRL ISLANDS NW@"
 Dungeons_Map_Name67: ; map_const WHIRL_ISLAND_NE,; 67
 	db "WHIRL ISLANDS NE@"
 Dungeons_Map_Name68: ; map_const WHIRL_ISLAND_SW,; 68
@@ -792,7 +792,7 @@ Ecruteak_Map_Name4: ; map_const ECRUTEAK_LUGIA_SPEECH_HOUSE ;  4
 Ecruteak_Map_Name5: ; map_const DANCE_THEATRE ;  5
 	db "DANCE THEATER@"
 Ecruteak_Map_Name6: ; map_const ECRUTEAK_MART ;  6
-	db "ECRUTEAK <POKE>MART@"
+	db "ECRUTEAK #MART@"
 Ecruteak_Map_Name7: ; map_const ECRUTEAK_GYM ;  7
 	db "ECRUTEAK GYM@"
 Ecruteak_Map_Name8: ; map_const ECRUTEAK_ITEMFINDER_HOUSE ;  8
@@ -851,7 +851,7 @@ Cerulean_Map_Name5: ; map_const CERULEAN_POKECENTER_2F_BETA ;  5
 Cerulean_Map_Name6: ; map_const CERULEAN_GYM ;  6
 	db "CERULEAN GYM@"
 Cerulean_Map_Name7: ; map_const CERULEAN_MART ;  7
-	db "CERULEAN <POKE>MART@"
+	db "CERULEAN #MART@"
 Cerulean_Map_Name8: ; map_const ROUTE_10_POKECENTER_1F ;  8
 	db "ROUTE 10 <PKMN> CEN.@"
 Cerulean_Map_Name9: ; map_const ROUTE_10_POKECENTER_2F_BETA ;  9
@@ -878,7 +878,7 @@ Azalea_Map_Name1: ; map_const AZALEA_POKECENTER_1F ;  1
 Azalea_Map_Name2: ; map_const CHARCOAL_KILN ;  2
 	db "CHARCOAL KILN@"
 Azalea_Map_Name3: ; map_const AZALEA_MART ;  3
-	db "AZALEA <POKE>MART@"
+	db "AZALEA #MART@"
 Azalea_Map_Name4: ; map_const KURTS_HOUSE ;  4
 	db "KURT'S HOUSE@"
 Azalea_Map_Name5: ; map_const AZALEA_GYM ;  5
@@ -899,7 +899,7 @@ Lake_of_Rage_Map_Name4: ; map_const ROUTE_43_GATE ;  4
 Lake_of_Rage_Map_Name5: ; map_const ROUTE_43 ;  5
 	db "ROUTE 43@"
 Lake_of_Rage_Map_Name6: ; map_const LAKE_OF_RAGE ; 6
-	db "LAKE OF RAGE@"                                             ; 10
+	db "LAKE OF RAGE@"
 
 Violet_Map_Name1: ; map_const ROUTE_32,;  1
 	db "ROUTE 32@"
@@ -912,7 +912,7 @@ Violet_Map_Name4: ; map_const ROUTE_37,;  4
 Violet_Map_Name5: ; map_const VIOLET_CITY,;  5
 	db "VIOLET CITY@"
 Violet_Map_Name6: ; map_const VIOLET_MART ;  6
-	db "VIOLET <POKE>MART@"
+	db "VIOLET #MART@"
 Violet_Map_Name7: ; map_const VIOLET_GYM ;  7
 	db "VIOLET GYM@"
 Violet_Map_Name8: ; map_const EARLS_POKEMON_ACADEMY ;  8
@@ -1002,7 +1002,7 @@ Vermilion_Map_Name7: ; map_const POKEMON_FAN_CLUB ;  7
 Vermilion_Map_Name8: ; map_const VERMILION_MAGNET_TRAIN_SPEECH_HOUSE ;  8
 	db "VERMILION HOUSE 2@"
 Vermilion_Map_Name9: ; map_const VERMILION_MART ;  9
-	db "VERMILION <POKE>MART@"
+	db "VERMILION #MART@"
 Vermilion_Map_Name10: ; map_const VERMILION_DIGLETTS_CAVE_SPEECH_HOUSE ; 10
 	db "VERMILION HOUSE 3@"
 Vermilion_Map_Name11: ; map_const VERMILION_GYM ; 11
@@ -1010,7 +1010,7 @@ Vermilion_Map_Name11: ; map_const VERMILION_GYM ; 11
 Vermilion_Map_Name12: ; map_const ROUTE_6_SAFFRON_GATE ; 12
 	db "ROUTE 6 GATE@"
 Vermilion_Map_Name13: ; map_const ROUTE_6_UNDERGROUND_PATH_ENTRANCE ; 13
-	db "ROUTE 6 UNDER.@"                                           ; 13
+	db "ROUTE 6 UNDER.@"
 
 Pallet_Map_Name1: ; map_const ROUTE_1,;  1
 	db "ROUTE 1@"
@@ -1034,7 +1034,7 @@ Pewter_Map_Name3: ; map_const PEWTER_NIDORAN_SPEECH_HOUSE ;  3
 Pewter_Map_Name4: ; map_const PEWTER_GYM ;  4
 	db "PEWTER GYM@"
 Pewter_Map_Name5: ; map_const PEWTER_MART ;  5
-	db "PEWTER <POKE>MART@"
+	db "PEWTER #MART@"
 Pewter_Map_Name6: ; map_const PEWTER_POKECENTER_1F ;  6
 	db "PEWTER <PKMN> CENTER@"
 Pewter_Map_Name7: ; map_const PEWTER_POKECENTER_2F_BETA ;  7
@@ -1095,7 +1095,7 @@ Fuchsia_Map_Name4: ; map_const ROUTE_18,;  4
 Fuchsia_Map_Name5: ; map_const FUCHSIA_CITY,;  5
 	db "FUCHSIA CITY@"
 Fuchsia_Map_Name6: ; map_const FUCHSIA_MART ;  6
-	db "FUCHSIA <POKE>MART@"
+	db "FUCHSIA #MART@"
 Fuchsia_Map_Name7: ; map_const SAFARI_ZONE_MAIN_OFFICE ;  7
 	db "SAFARI ZONE HQ@"
 Fuchsia_Map_Name8: ; map_const FUCHSIA_GYM ;  8
@@ -1130,7 +1130,7 @@ Lavender_Map_Name8: ; map_const LAVENDER_SPEECH_HOUSE ;  8
 Lavender_Map_Name9: ; map_const LAVENDER_NAME_RATER ;  9
 	db "KANTO NAME RATER@"
 Lavender_Map_Name10: ; map_const LAVENDER_MART ; 10
-	db "LAVENDER <POKE>MART@"
+	db "LAVENDER #MART@"
 Lavender_Map_Name11: ; map_const SOUL_HOUSE ; 11
 	db "SOUL HOUSE@"
 Lavender_Map_Name12: ; map_const LAV_RADIO_TOWER_1F,; 12
@@ -1234,7 +1234,7 @@ Cianwood_Map_Name8: ; map_const CIANWOOD_PHOTO_STUDIO ;  8
 Cianwood_Map_Name9: ; map_const CIANWOOD_LUGIA_SPEECH_HOUSE ;  9
 	db "CIANWOOD HOUSE@"
 Cianwood_Map_Name10: ; map_const POKE_SEERS_HOUSE ; 10
-	db "<POKE>SEER HOUSE@"
+	db "#SEER HOUSE@"
 Cianwood_Map_Name11: ; map_const BATTLE_TOWER_1F ; 11
 	db "BATTLE TOWER 1F@"
 Cianwood_Map_Name12: ; map_const BATTLE_TOWER_BATTLE_ROOM ; 12
@@ -1263,7 +1263,7 @@ Viridian_Map_Name6: ; map_const TRAINER_HOUSE_1F ;  6
 Viridian_Map_Name7: ; map_const TRAINER_HOUSE_B1F ;  7
 	db "VIRIDIAN HOUSEB1F@"
 Viridian_Map_Name8: ; map_const VIRIDIAN_MART ;  8
-	db "VIRIDIAN <POKE>MART@"
+	db "VIRIDIAN #MART@"
 Viridian_Map_Name9: ; map_const VIRIDIAN_POKECENTER_1F ;  9
 	db "VIRIDIAN <PKMN> CEN.@"
 Viridian_Map_Name10: ; map_const VIRIDIAN_POKECENTER_2F_BETA ; 10
@@ -1311,7 +1311,7 @@ Saffron_Map_Name3: ; map_const FIGHTING_DOJO ;  3
 Saffron_Map_Name4: ; map_const SAFFRON_GYM,  ;  4
 	db "SAFFRON GYM@"
 Saffron_Map_Name5: ; map_const SAFFRON_MART ;  5
-	db "SAFFRON <POKE>MART@"
+	db "SAFFRON #MART@"
 Saffron_Map_Name6: ; map_const SAFFRON_POKECENTER_1F ;  6
 	db "SAFFRON <PKMN> CENTER@"
 Saffron_Map_Name7: ; map_const SAFFRON_POKECENTER_2F_BETA ;  7
