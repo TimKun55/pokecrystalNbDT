@@ -33,7 +33,7 @@ DisplayDexMonEvos:
 	cp b
 	jr nz, .dont_arrow_stage1
 	hlcoord 5, 2
-	ld [hl], "→"
+	ld [hl], "<DEX_→>"
 .dont_arrow_stage1	
 	hlcoord 6, 2
 	call EVO_sethlcoord
@@ -133,7 +133,7 @@ DisplayDexMonEvos:
 	cp b
 	jr nz, .dont_print_arrow
 	dec hl
-	ld [hl], "→"
+	ld [hl], "<DEX_→>"
 	inc hl
 .dont_print_arrow
 	pop bc ; count and stage

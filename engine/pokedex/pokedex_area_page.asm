@@ -2,6 +2,31 @@ INCLUDE "engine/pokedex/pokedex_area_page_trees_rocks.asm"
 INCLUDE "engine/pokedex/pokedex_area_page_fishing.asm"
 INCLUDE "data/wild/non_wildmon_locations.asm"
 
+; from: constants\pokemon_data_constants.asm:
+; wild data
+ 
+; DEF NUM_GRASSMON EQU 7 ; data/wild/*_grass.asm table size
+; DEF NUM_WATERMON EQU 3 ; data/wild/*_water.asm table size
+ 
+; DEF GRASS_WILDDATA_LENGTH EQU 2 + 3 + NUM_GRASSMON * 2 * 3 ; vanilla is $2f, 47 bytes. 3 different times of day
+; DEF WATER_WILDDATA_LENGTH EQU 2 + 1 + NUM_WATERMON * 2 ; only 1 time of day
+; DEF FISHGROUP_DATA_LENGTH EQU 1 + 2 * 3
+ 
+DEF AREA_ENTRY_SIZE_BYTES EQU 2 ; vanilla is 2 bytes, 1 byte for lvl, 1 for species index. pk 16, species is 2 bytes
+DEF AREA_ENTRY_SKIP_ENCOUNTER_RATES EQU 6 ; see the wild data: db 2 percent, 2 percent, 2 percent ; encounter rates: morn/day/nite
+DEF AREA_ENTRY_TIMEOFDAY_PRINT_SPACING EQU 6
+ 
+DEF AREA_MORN_ICON EQU $65 ; from gfx\pokedex\pokedex.2bpp
+DEF AREA_DAY_ICON EQU $6b ; from gfx\pokedex\pokedex.2bpp
+DEF AREA_NITE_ICON EQU $6c ; from gfx\pokedex\pokedex.2bpp
+ 
+DEF MAX_ENTRIES_PER_PAGE EQU 3 ; we have 7 lines per page, and each entry takes two lines
+DEF MAX_LINES_PRINTED_PER_PAGE EQU MAX_ENTRIES_PER_PAGE * 2 ; 6
+ 
+; DEF NUM_ROAMMON_MAPS EQU 16 ; RoamMaps table size (see data/wild/roammon_maps.asm)
+; DEF NUM_ROAMMONS EQU 2 ; G/S is three, and wram still has 3 roamers
+; ; but  Crystal only has 2. please change this if you want to use the 3rd
+
 String_johto_text:
 	db "JOHTO:     @"
 String_kanto_text:
@@ -302,16 +327,16 @@ Print_area_entry:
 	push de ; day (e) /nite (d) encounter rates
 	hlcoord 2, 10 ; same position regardless
 	call DexEntry_adjusthlcoord ; current print line needs to be in c
-	ld [hl], $65 ; day icon tile
-	ld de, 6
+	ld [hl], AREA_MORN_ICON ; $65 ; day icon tile
+ 	ld de, AREA_ENTRY_TIMEOFDAY_PRINT_SPACING
 	add hl, de
-	ld [hl], $6b ; day icon tile
+	ld [hl], AREA_DAY_ICON ; $6b ; day icon tile
 	add hl, de
-	ld [hl], $6c ; nite icon tile 
+	ld [hl], AREA_NITE_ICON ; nite icon tile 
 	hlcoord 6, 10
 	call DexEntry_adjusthlcoord ; current print line needs to be in c
 	ld [hl], "<%>"
-	ld de, 6
+	ld de, AREA_ENTRY_TIMEOFDAY_PRINT_SPACING
 	add hl, de
 	ld [hl], "<%>"
 	add hl, de
@@ -493,7 +518,7 @@ Pokedex_DetailedArea_grass:
  	jr z, .reached_end ; end of data table 
  	; we dont need to handle having printed all 3 slots if we were at the end of the table
  	ld a, c
- 	cp $6 ; 3 entries, 6 rows
+	cp MAX_LINES_PRINTED_PER_PAGE ; $6 ; 3 entries, 6 rows
  	jr z, .max_print
 
 	call DexArea_IncWildMonIndex
@@ -526,7 +551,7 @@ Pokedex_DetailedArea_grass:
 Pokedex_Parse_grass:
 	push hl ; first species byte in morn
 	push bc ; current print line
-	ld c, 14 ; 7 entries * 2 bytes
+	ld c, NUM_GRASSMON * AREA_ENTRY_SIZE_BYTES ; 14 ; 7 mon entries * 2 bytes
 	call SimpleMultiply
 	ld b, 0
 	ld c, a ; time of day adjustment
@@ -572,7 +597,7 @@ Grass_check_any_remaining:
 
 .landmark_loop
 	call DexArea_IncWildMonIndex
- 	ld bc, 6
+	ld bc, AREA_ENTRY_SKIP_ENCOUNTER_RATES ; 6 
  	add hl, bc
  	push hl ; now pointing to species
 ; morn
@@ -597,7 +622,7 @@ Grass_check_any_remaining:
 	jr nz, .entries_remaining
 
 	ld b, 0
-	ld c, GRASS_WILDDATA_LENGTH - 6 ; to be at the right pointer to read the -1 if it's there, aka the mapgroup/num ptr
+	ld c, GRASS_WILDDATA_LENGTH - AREA_ENTRY_SKIP_ENCOUNTER_RATES ; 6 ; to be at the right pointer to read the -1 if it's there, aka the mapgroup/num ptr
  	add hl, bc ; increment index without touching our wram index
  	; check to see if we've reached the end of the wild data file, -1
 	ld a, BANK(JohtoGrassWildMons)
@@ -741,7 +766,7 @@ Pokedex_DetailedArea_surf:
 	jr z, .reached_end ; end of data table 
  	; we dont need to handle having printed all 3 slots if we were at the end of the table
  	ld a, c
- 	cp $6 ; 3 entries, 6 rows
+	cp MAX_LINES_PRINTED_PER_PAGE ; $6 ; 3 entries, 6 rows
  	jr z, .max_print
 
 	call DexArea_IncWildMonIndex
@@ -903,7 +928,7 @@ Dex_Check_Grass:
 	inc hl
 	inc hl ; should now point to lvl of encounter slot
 	inc hl ; now pointing to species
-	inc hl
+	inc hl ; equivalent to adding AREA_ENTRY_SKIP_ENCOUNTER_RATES to hl, 6 bytes
 	ld a, BANK(JohtoGrassWildMons)
 	call Pokedex_LookCheck_grass
 	and a
@@ -1152,15 +1177,15 @@ Pokedex_DetailedArea_bugcontest:
 BugContest_Print:
 	ld b, e ; encounter %
 	hlcoord 2, 14 ; same position regardless
-	ld [hl], $65 ; day icon tile
-	ld de, 6
+	ld [hl], AREA_MORN_ICON ; $65 ; day icon tile
+ 	ld de, AREA_ENTRY_TIMEOFDAY_PRINT_SPACING ; 6
 	add hl, de
-	ld [hl], $6b ; day icon tile
+	ld [hl], AREA_DAY_ICON ;$6b ; day icon tile
 	add hl, de
-	ld [hl], $6c ; nite icon tile 
+	ld [hl], AREA_NITE_ICON ; $6c ; nite icon tile 
 	hlcoord 6, 14
 	ld [hl], "<%>"
-	ld de, 6
+	ld de, AREA_ENTRY_TIMEOFDAY_PRINT_SPACING
 	add hl, de
 	ld [hl], "<%>"
 	add hl, de
@@ -1507,7 +1532,7 @@ Print_casinomon:
 	push hl ; print location
 	call PrintNum
 	pop hl ; print location
-	ld de, 7 ; spaces to inc print line over
+	ld de, $7 ; spaces to inc print line over
 	add hl, de
 	ld de, .coins_text
 	call PlaceString
@@ -1519,6 +1544,8 @@ Print_casinomon:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; CASINO END ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NPC TRADES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; see constants\npc_trade_constants.asm
+; see data\events\npc_trades.asm
 ; NPCTrades::
 ; NPCTRADE_GIVEMON  rb
 ; NPCTRADE_GETMON   rb
@@ -1538,12 +1565,12 @@ Print_casinomon:
 
 Dex_Check_npctrades:
 ; return zero in 'a' if found, else 1 in 'a'
-	ld hl, NPCTrades
+	ld hl, NPCTrades ; see data\events\npc_trades.asm
 	ld bc, 0 ; count in b, corresponding to NUM_NPC_TRADES
-	ld de, NPCTRADE_GETMON
+	ld de, NPCTRADE_GETMON ; see constants\npc_trade_constants.asm
 	add hl, de	
 .loop
-	ld a, NUM_NPC_TRADES
+	ld a, NUM_NPC_TRADES ; see constants\npc_trade_constants.asm
 	cp b ; count, trade entry index
 	jr z, .notfound
 
@@ -1556,7 +1583,7 @@ Dex_Check_npctrades:
 	jr z, .found
 	
 	; species didnt match, inc hl by NPCTRADE_STRUCT_LENGTH
-	ld de, NPCTRADE_STRUCT_LENGTH ; size of npctrade entry, NPCTRADE_STRUCT_LENGTH
+	ld de, NPCTRADE_STRUCT_LENGTH ; size of npctrade entry, NPCTRADE_STRUCT_LENGTH ; see constants\npc_trade_constants.asm
 	add hl, de
 	inc b ; count, trade entry index
 	jr .loop
@@ -1583,7 +1610,7 @@ Pokedex_DetailedArea_npctrades:
 	call Print_Category_text
 
 ; cannot assume there will be no species repeats
-	ld hl, NPCTrades
+	ld hl, NPCTrades ; see data\events\npc_trades.asm
 	ld c, NPCTRADE_STRUCT_LENGTH
 	ld a, [wPokedexStatus] ; wildmon index
 	call AddNTimes
