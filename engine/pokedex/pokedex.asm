@@ -3278,11 +3278,6 @@ Pokedex_LoadAllGFX:
 	ld hl, vTiles2 tile $60
 	ld bc, $20 tiles
 	call Pokedex_InvertTiles
- 	
- 	ld hl, vTiles0 tile $3f
- 	ld de, vTiles0 tile 15
- 	lb bc, BANK(vTiles0), 1 ; tile
- 	call Get2bpp
 
 	call Pokedex_CheckSGB
  	jr nz, .LoadCGBPokedex
@@ -3293,6 +3288,14 @@ Pokedex_LoadAllGFX:
  	call Pokedex_LoadGFX
  .LoadSlowpokePokedex
  	call Pokedex_LoadSlowpokeGFX
+
+; copy cursor from Slowpoke GFX
+ 	call DisableLCD
+ 	ld hl, vTiles0 tile $3f
+ 	ld de, vTiles0 tile 15
+ 	lb bc, BANK(vTiles0), 1 ; tile
+ 	call Get2bpp
+ 	call Pokedex_Enable_LCD
  	ret
 
 Pokedex_Enable_LCD:
