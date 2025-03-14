@@ -605,15 +605,26 @@ EVO_place_Mon_Types:
 	ld [wCurSpecies], a	
 	call GetBaseData
 
+IF EVO_HIDE_UNSEEN == TRUE
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen_done_1
+ 	ld c, 18 ; index of ???
+ 	jr .skip_to_unk_1
+.seen_done_1
+ENDC
+
 ; set up the palette based on the current mon slot
 	ld a, [wBaseType1]
 
 IF SWAP_DARK_GHOST_TYPES == TRUE
  	call Evo_page_Swap_Dark_Ghost
 ENDC
-
 	ld c, a
 	predef GetMonTypeIndex
+
+IF EVO_HIDE_UNSEEN == TRUE
+.skip_to_unk_1
+ENDC	
 	ld d, c
 	ld a, [wBaseType2]
 IF SWAP_DARK_GHOST_TYPES == TRUE
@@ -622,6 +633,21 @@ ENDC
 	ld c, a ; type 2
 	predef GetMonTypeIndex
 	ld b, d
+
+IF EVO_HIDE_UNSEEN == TRUE
+ 	push de
+ 	push bc
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen_done_2
+ 	pop bc
+ 	pop de
+ 	ld c, 18 ; index of ???
+ 	jr .skip_to_unk_2
+.seen_done_2
+ 	pop bc
+ 	pop de
+.skip_to_unk_2
+ENDC
 
 IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 	call .determine_paladdr ; pal 1, 2, 3, or 4
@@ -639,6 +665,19 @@ ENDC
 	ld c, a
 	predef GetMonTypeIndex
 	ld a, c
+
+IF EVO_HIDE_UNSEEN == TRUE
+ 	push af
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen_done_3
+ 	pop af ; unload stack
+ 	ld a, 18 ; index of ???
+ 	jr .done_3
+.seen_done_3
+ 	pop af
+.done_3
+ENDC
+
 IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 	ld hl, TypeLightIconGFX
 	ld bc, 4 * LEN_2BPP_TILE
@@ -687,6 +726,18 @@ ENDC
 	ld c, a ; type 2
  	predef GetMonTypeIndex
  	ld a, c ; type 2
+
+IF EVO_HIDE_UNSEEN == TRUE
+ 	push af
+ 	call EVO_CheckSeenMon
+ 	jr nz, .seen_done_4
+ 	pop af
+ 	ld a, 18 ; index of ???
+ 	jr .skip_to_unk_4
+.seen_done_4
+ 	pop af
+.skip_to_unk_4
+ENDC
 
 IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 ; load type 2 tiles
