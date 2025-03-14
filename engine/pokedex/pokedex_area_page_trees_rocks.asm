@@ -80,10 +80,11 @@ Pokedex_DetailedArea_Trees:
 	call DexEntry_IncPageNum
 	ret
 
+; these two are called in pokedex_area_page.asm
 Dex_Check_Trees_firstcommon:
-	ld a, DEXENTRY_AREA_TREES_RARE
+	ld a, DEXENTRY_AREA_TREES_COMMON
 	jr Dex_Check_Trees_firstrare.stub
-Dex_Check_Trees_firstrare:
+Dex_Check_Trees_firstrare: ; these two are called in pokedex_area_page.asm
 	ld a, DEXENTRY_AREA_TREES_RARE
 .stub	
 	ld [wPokedexEntryType], a
