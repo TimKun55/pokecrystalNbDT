@@ -539,9 +539,8 @@ Pokegear_UpdateClock:
 	decoord 11, 1
 	farcall PrintHoursMins
 	ld hl, .GearTodayText
-	bccoord 6, 6 ; bccoord 2, 6
-	call PrintTextboxTextAt
-	ret
+	bccoord 2, 6
+ 	call PrintTextboxTextAt ; PlaceHLTextAtBC bccoord 6, 6
 
 	; draw border
  	; ; Fix center Box since i cant find the func that originally drew this one
