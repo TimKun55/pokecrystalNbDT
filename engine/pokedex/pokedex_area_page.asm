@@ -566,30 +566,15 @@ Pokedex_Parse_grass:
 	ret
 
 Grass_check_any_remaining:
-	push hl
+	push hl ; pointing to next index's first entry byte: map group/num
 	push de
 	push bc
 
-	ld b, 0
-	ld c, GRASS_WILDDATA_LENGTH
-	add hl, bc
-	ld bc, 0 ; fake print line counter
-	push bc
-	push hl
 .landmark_loop
-	ld a, BANK(JohtoGrassWildMons)
-	call GetFarWord
-	pop hl  ; points to map group/num
-	pop bc ; line counter
-	push bc ; line counter
-	push hl ; points to map group/num
-	; skip map encounter rates
-	inc hl
-	inc hl
-	inc hl
-	inc hl
-	inc hl ; should now point to lvl of encounter slot
-	inc hl ; now pointing to species
+	call DexArea_IncWildMonIndex
+ 	ld bc, 6
+ 	add hl, bc
+ 	push hl ; now pointing to species
 ; morn
 	ld a, 0 ; morn
 	call Pokedex_Parse_grass ; encounter % in a
@@ -601,6 +586,7 @@ Grass_check_any_remaining:
 	call Pokedex_Parse_grass ; encounter % in a
 	ld d, a
 	ld a, b
+	pop hl ; now pointing to species
 	and a
 	jr nz, .entries_remaining
 	ld a, e
@@ -789,7 +775,7 @@ Pokedex_DetailedArea_surf:
 	call Surf_check_any_remaining
 	and a
 	jr z, .reached_end
-	call DexArea_IncWildMonIndex
+;	call DexArea_IncWildMonIndex
 	call DexEntry_IncPageNum
 	; page number is currently in a
 	xor a ; to ensure a isnt actually returned at -1. 0 is for normal
