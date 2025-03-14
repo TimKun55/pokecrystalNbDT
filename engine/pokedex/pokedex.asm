@@ -1399,8 +1399,22 @@ Pokedex_UpdateUnownMode:
 	ld [wJumptableIndex], a
 	call DelayFrame
 	call Pokedex_CheckSGB
+IF USE_COMPRESSED_POKEDEX_GFX == TRUE
+ 	jr nz, .decompress
+ELSE
 	jp nz, Pokedex_LoadGFX
+ENDC
 	farcall LoadSGBPokedexGFX2
+IF USE_COMPRESSED_POKEDEX_GFX == TRUE
+ 	jr .done
+ 
+.decompress
+ 	ld hl, PokedexLZ
+ 	ld de, vTiles2 tile $31
+ 	lb bc, BANK(PokedexLZ), 58
+ 	call DecompressRequest2bpp
+.done
+ENDC
 	ret
 
 Pokedex_UnownModeHandleDPadInput:
@@ -3273,33 +3287,53 @@ Pokedex_LoadAllGFX:
 	call Pokedex_CheckSGB
  	jr nz, .LoadCGBPokedex
  	farcall LoadSGBPokedexGFX
- 	call .enable_lcd
+	call Pokedex_Enable_LCD
  	jr .LoadSlowpokePokedex
  .LoadCGBPokedex
- 	call .enable_lcd
  	call Pokedex_LoadGFX
  .LoadSlowpokePokedex
  	call Pokedex_LoadSlowpokeGFX
  	ret
 
- .enable_lcd:
+Pokedex_Enable_LCD:
 	ld a, 6
 	call SkipMusic
 	call EnableLCD
 	ret
 
 Pokedex_LoadGFX:
+IF USE_COMPRESSED_POKEDEX_GFX == FALSE
+ 	call Pokedex_Enable_LCD
  	ld de, PokedexGFX
  	ld hl, vTiles2 tile $31
  	lb bc, BANK(PokedexGFX), $4f
  	call Request2bpp
+ELSE
+; IF USE_COMPRESSED_POKEDEX_GFX == TRUE
+ 	call DisableLCD
+ 	ld a, BANK(PokedexLZ)
+ 	ld hl, PokedexLZ
+ 	ld de, vTiles2 tile $31
+ 	call FarDecompress
+ 	call Pokedex_Enable_LCD
+ENDC
  	ret
  
- Pokedex_LoadSlowpokeGFX:
+Pokedex_LoadSlowpokeGFX:
+IF USE_COMPRESSED_POKEDEX_GFX == FALSE
  	ld de, PokedexSlowpokeGFX
  	ld hl, vTiles0
  	lb bc, BANK(PokedexSlowpokeGFX), $38
  	call Request2bpp
+ELSE
+; IF USE_COMPRESSED_POKEDEX_GFX == TRUE
+ 	call DisableLCD
+ 	ld a, BANK(PokedexSlowpokeLZ)
+ 	ld hl, PokedexSlowpokeLZ
+ 	ld de, vTiles0
+ 	call FarDecompress
+ 	call Pokedex_Enable_LCD
+ENDC
  	ret
 
 Pokedex_LoadPageNums:

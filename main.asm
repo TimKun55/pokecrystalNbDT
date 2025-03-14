@@ -674,17 +674,35 @@ INCLUDE "engine/events/battle_tower/load_trainer.asm"
 INCLUDE "engine/events/odd_egg.asm"
 
 
-SECTION "DEX GFX 2", ROMX
+SECTION "Nayru Pokedex", ROMX
 
-; PokedexLZ:
-; INCBIN "gfx/pokedex/pokedex.2bpp.lz"
+INCLUDE "engine/pokedex/pokedex.asm"
+
+
+SECTION "Custom GFX", ROMX
+
+INCLUDE "gfx/rangi_gfx.asm"
+
+
+SECTION "Map GroupNums Names", ROMX
+
+INCLUDE "data/maps/map_names.asm"
+
+
+SECTION "DEX GFX 2", ROMX
+IF USE_COMPRESSED_POKEDEX_GFX == TRUE
+PokedexLZ:
+INCBIN "gfx/pokedex/pokedex.2bpp.lz"
+PokedexSlowpokeLZ:
+INCBIN "gfx/pokedex/slowpoke.2bpp.lz"
+ELSE
+; IF USE_COMPRESSED_POKEDEX_GFX == FALSE
 PokedexGFX:
 INCBIN "gfx/pokedex/pokedex.2bpp"
  
-; PokedexSlowpokeLZ:
-; INCBIN "gfx/pokedex/slowpoke.2bpp.lz"
 PokedexSlowpokeGFX:
 INCBIN "gfx/pokedex/slowpoke.2bpp"
+ENDC
 
 Pokedex_ExtraTiles:
 INCBIN "gfx/pokedex/rangi_dex_tiles.2bpp"
@@ -698,24 +716,14 @@ Pokedex_RightArrow_Tile:
 INCBIN "gfx/pokedex/inversed_rightarrow.1bpp"
 
 
-SECTION "Nayru Pokedex", ROMX
-INCLUDE "engine/pokedex/pokedex.asm"
-
-
 SECTION "Nayru Pokedex2", ROMX
 INCLUDE "engine/pokedex/pokedex_2.asm"
 
 
-SECTION "Map GroupNums Names", ROMX
-INCLUDE "data/maps/map_names.asm"
 SECTION "Bank3E Overflow", ROMX
 INCLUDE "engine/link/time_capsule.asm"
 INCLUDE "engine/link/time_capsule_2.asm"
 INCLUDE "engine/events/magikarp.asm"
-
-
-SECTION "Custom GFX", ROMX
-INCLUDE "gfx/rangi_gfx.asm"
 
 
 SECTION "Newbox", ROMX
