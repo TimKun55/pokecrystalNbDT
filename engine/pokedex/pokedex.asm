@@ -1752,21 +1752,31 @@ Pokedex_DrawDexEntryScreenBG:
 	call ByteFill
 	ld c, 4
  	call DelayFrames
- ; erase the bottom half of screen where info will go
+; erase the bottom half of screen where info will go
  	lb bc, 8, SCREEN_WIDTH - 1 ; 8 tiles high, 19 tiles wide
  	hlcoord 1, 8 
  	call ClearBox
- ; horizonal skinny line ending in the page num tab
+; horizonal skinny line ending in the page num tab
  	hlcoord 1, 8
  	ld bc, 19
  	ld a, $55
  	call ByteFill
- ; category enclosure
+; category enclosure
+; ; corners
+; 	hlcoord 8, 5
+; 	ld [hl], $6f
+; 	inc hl
+; plaine horizontal line
  	hlcoord 8, 5
  	ld a, $4e ; VRAM 1
  	ld bc, 12
  	call ByteFill
- ; place species name
+; ; vertical lateral lines	
+; 	hlcoord 8, 6
+; 	ld [hl], $6e
+; 	hlcoord 8, 7
+; 	ld [hl], $6e
+; place species name
  	ld a, [wTempSpecies]
  	ld [wCurSpecies], a
  	farcall DisplayDexMonType_CustomGFX
@@ -1774,7 +1784,7 @@ Pokedex_DrawDexEntryScreenBG:
  	hlcoord 9, 3
  	call PlaceString ; mon species	
  ; .print_dex_num ; Print dex number
- 	hlcoord 13, 1
+ 	hlcoord 10, 1
  	ld a, $5c ; No
  	ld [hli], a
  	ld a, $e8 ; .
@@ -1798,7 +1808,7 @@ Pokedex_DrawDexEntryScreenBG:
  	call CheckCaughtMon
  	ret z
  ; place Caught ball icon
- 	hlcoord 12, 1
+ 	hlcoord 16, 1
  	ld [hl], $4f ; pokeball icon
 	ret
 
@@ -3315,13 +3325,24 @@ Pokedex_LoadPageNums:
  	ldh [rVBK], a
  	ld de, Pokedex_PageNumTiles tile 0
  	ld hl, vTiles2 tile $60
- 	lb bc, BANK(Pokedex_PageNumTiles), 16
+	lb bc, BANK(Pokedex_PageNumTiles), 14
  	call Request2bpp
+; ; corner of box	
+ 	; ld de, Pokedex_PageNumTiles tile 16
+ 	; ld hl, vTiles2 tile $6f
+ 	; lb bc, BANK(Pokedex_PageNumTiles), 1
+ 	; call Request2bpp
+ ; plain line
  	ld de, Pokedex_PageNumTiles tile 13
  	ld hl, vTiles2 tile $4e
  	lb bc, BANK(Pokedex_PageNumTiles), 1
- 	call Request2bpp	
-; ; single black tile at vram1 $7f
+	call Request2bpp
+ ; ; vertical line
+ ; 	ld de, Pokedex_PageNumTiles tile 15
+ ; 	ld hl, vTiles2 tile $5a
+ ; 	lb bc, BANK(Pokedex_PageNumTiles), 1
+ ; 	call Request2bpp	
+ ; single black tile at vram1 $7f
  	ld de, Pokedex_ExtraTiles tile 31
  	ld hl, vTiles2 tile $7f
 	lb bc, BANK(Pokedex_ExtraTiles), 1
