@@ -114,9 +114,15 @@ DisplayDexMonEvos:
 	push hl ; manner of EVO byte + 1
 ; get Species	
 	cp EVOLVE_STAT
-	jr nz, .no_extra1
+	jr z, .extra_byte_1
+ IF DEF(EVOLVE_HELD_LEVEL)
+ 	cp EVOLVE_HELD_LEVEL
+ 	jr z, .extra_byte_1
+ ENDC
+ 	jr .no_extra_1
+ .extra_byte_1
 	inc hl
-.no_extra1
+.no_extra_1
 	inc hl ; species byte
 	ld a, BANK("Evolutions and Attacks")
 	call GetFarByte ; species
@@ -161,14 +167,28 @@ DisplayDexMonEvos:
 	call z, EVO_happiness
 	cp EVOLVE_STAT
 	call z, EVO_stats
+IF DEF(EVOLVE_HELD)	
+ 	cp EVOLVE_HELD
+ 	call z, EVO_held
+ ENDC
+ IF DEF(EVOLVE_HELD_LEVEL)	
+ 	cp EVOLVE_HELD_LEVEL
+ 	call z, EVO_held_level
+ ENDC
 ; after the Evo manner specific prints, HL should be pointing to next EVO manner or 0
 	pop af ; manner of evo
 	pop hl ; manner of evo byte +1
 ; get Next EVO Manner or 0	
 	cp EVOLVE_STAT
-	jr nz, .no_extra2
+	jr z, .extra_byte_2
+ IF DEF(EVOLVE_HELD_LEVEL)
+ 	cp EVOLVE_HELD_LEVEL
+ 	jr z, .extra_byte_2
+ ENDC
+ 	jr .no_extra_2
+ .extra_byte_2
 	inc hl
-.no_extra2
+.no_extra_2
 	inc hl ; species byte
 	inc hl ; points to next evo manner or 0
 	ld a, BANK(EvosAttacksPointers)
@@ -188,7 +208,7 @@ DisplayDexMonEvos:
 	cp 3
 	jp z, .exit_early_print_cont
 	pop af
-	jr .main_loop
+	jp .main_loop
 .done_stage
 	xor a
 	cp b
@@ -212,9 +232,15 @@ DisplayDexMonEvos:
 	ld a, BANK("Evolutions and Attacks")
 	call GetFarByte ; manner of stage 1 evo ; if zero, no evos
 	cp EVOLVE_STAT
-	jr nz, .no_extra3
+	jr z, .extra_byte_3
+ IF DEF(EVOLVE_HELD_LEVEL)
+ 	cp EVOLVE_HELD_LEVEL
+ 	jr z, .extra_byte_3
+ ENDC
+ 	jr .no_extra_3
+ .extra_byte_3
 	inc hl
-.no_extra3
+.no_extra_3
 	inc hl
 	inc hl ; species byte
 	ld a, BANK("Evolutions and Attacks")
@@ -472,6 +498,64 @@ EVO_stats:
 	db "ATK > DEF@"
 .atk_lt_def_text:
 	db "ATK < DEF@"
+
+IF DEF(EVOLVE_HELD)
+ EVO_held:
+ 	ld a, BANK("Evolutions and Attacks")
+ 	call GetFarByte
+ 	push af ; item index or -1 for no item
+ 	call EVO_gethlcoord
+ 	ld de, .hold_text
+ 	call PlaceString ; hold text
+ 	
+ 	pop af
+ 	ld [wNamedObjectIndex], a
+ 	call GetItemName
+ 	call EVO_inchlcoord
+ 	call EVO_inchlcoord
+ 	call PlaceString
+ .done
+ 	call EVO_inchlcoord
+ 	ret
+ .hold_text:
+ 	db "HOLD@"
+ ENDC
+ 
+ IF DEF(EVOLVE_HELD_LEVEL)
+ EVO_held_level:
+ 	; push hl ; pointing to item byte
+ 	ld a, BANK("Evolutions and Attacks")
+ 	call GetFarByte
+ 	push af ; item index
+ 
+ 	inc hl ; pointing to lvl byte
+ 	ld a, BANK("Evolutions and Attacks")
+ 	call GetFarByte
+ 	ld [wTextDecimalByte], a
+ 	call EVO_gethlcoord
+ 	push hl ; position of lvl icon
+ 	; ld [hl], "<DEX_LV_VRAM1>" ; lvl icon
+ 	ld de, .hold_text
+ 	call PlaceString
+ 
+ 	ld de, wTextDecimalByte
+ 	pop hl ; position of lvl icon
+ 	call EVO_inchlcoord
+ 	inc hl
+ 	lb bc, PRINTNUM_LEFTALIGN | 1, 2
+ 	call PrintNum ; lvl evolved at
+ 	
+ 	pop af
+ 	ld [wNamedObjectIndex], a
+ 	call GetItemName
+ 	call EVO_inchlcoord
+ 	call PlaceString	
+ .done
+ 	call EVO_inchlcoord
+ 	ret
+ .hold_text:
+ 	db "<DEX_LV_VRAM1>   + HOLD@"
+ ENDC
 
 EVO_place_Mon_Types:
 	push af
@@ -837,9 +921,15 @@ EVO_set_multi_page_ptr:
 	; check for 0? shouldnt encounter 0
 	ld a, d
 	cp EVOLVE_STAT
-	jr nz, .no_extra1
+	jr z, .extra_4
+ IF DEF(EVOLVE_HELD_ITEM)
+ 	cp EVOLVE_HELD_ITEM
+ 	jr z, .extra_4
+ ENDC
+ 	jr .no_extra_4
+ .extra_4
 	inc hl
-.no_extra1
+.no_extra_4
 	inc hl
 	inc hl ; species byte
 	inc hl ; next EVO manner byte
@@ -849,9 +939,15 @@ EVO_set_multi_page_ptr:
 	call GetFarByte ; manner of evo ; if zero, no evos
 	; check for 0? shouldnt encounter 0
 	cp EVOLVE_STAT
-	jr nz, .no_extra2
+	jr z, .extra_5
+ IF DEF(EVOLVE_HELD_ITEM)
+ 	cp EVOLVE_HELD_ITEM
+ 	jr z, .extra_5
+ ENDC
+ 	jr .no_extra_5
+ .extra_5
 	inc hl
-.no_extra2
+.no_extra_5
 	inc hl
 	inc hl ; species byte
 	ld a, BANK("Evolutions and Attacks")

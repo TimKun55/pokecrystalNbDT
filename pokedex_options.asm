@@ -1,26 +1,32 @@
-; using 'Increase Pokémon sprite animation size'?
-; https://github.com/pret/pokecrystal/wiki/Increase-Pok%C3%A9mon-sprite-animation-size
-	; NOTE this should only be enabled if you've already implemented the tutorial
-DEF USING_INCREASED_SPRITE_ANIMATION EQU FALSE
-
-
-; Use Rangi's Gen3 Type GFX imported from Polished Crystal?
+	; Use Rangi's Gen3 Type GFX imported from Polished Crystal?
 DEF USE_GEN3_STYLE_TYPE_GFX EQU TRUE
-	; if FALSE, use 3-letter shorthand for Types
+	; if FALSE, uses 4-letter shorthand for Types
 	; see 'engine\pokedex\pokedex2.asm'
 
+; Using custom Evolution Methods?
+ 	; see 'engine\pokedex\pokedex_evolution_page.asm'
+ 	; Currently supports:
+ 	; EVOLVE_HELD 		(evolves if lvl-up while holding specified item)
+ 	; EVOLVE_HELD_LEVEL	(after specified lvl, evolves if lvl-up while holding specified item)
+ 		; 'Evolve while holding an item' tutorial CURRENTLY SUPPORTED
+ 		; https://github.com/pret/pokecrystal/wiki/Evolve-while-holding-an-item		
+ 	; (maybe will add more in the future, feel free to submit specific requests)
+ 		
+ 
+ 	; using 'Increase Pokémon sprite animation size'?
+ DEF USING_INCREASED_SPRITE_ANIMATION EQU FALSE
+ 	; https://github.com/pret/pokecrystal/wiki/Increase-Pok%C3%A9mon-sprite-animation-size
+ 		; NOTE this should only be enabled if you've already implemented the tutorial
 
-; Swap Dark and Ghost?
-; some people dont want to use Physical Special Split, but want Dark to be Physical and Ghost to be Special
-	; ensure they are swapped everywhere else they need to be, this JUST swaps them in the Pokedex
+	; Swap Dark and Ghost?
 DEF SWAP_DARK_GHOST_TYPES EQU FALSE
+	; some people dont want to use Physical Special Split, but want Dark to be Physical and Ghost to be Special
+ 		; ensure they are swapped everywhere else they need to be, this JUST swaps them in the Pokedex
 
-
-; Absolutely no room to have uncompressed PokedexGFX (PokedexLZ) (gfx/pokedex/pokedex.2bpp)?
-; or Pokedex Slowpoke Search GFX (PokedexSlowpokeLZ)(gfx/pokedex/slowpoke.2bpp)?
+	; Absolutely no room to have uncompressed PokedexGFX (PokedexLZ) (gfx/pokedex/pokedex.2bpp)?
+ 	; or Pokedex Slowpoke Search GFX (PokedexSlowpokeLZ)(gfx/pokedex/slowpoke.2bpp)?
 DEF USE_COMPRESSED_POKEDEX_GFX EQU FALSE
-	; just be aware that using compression will cause ugly white flashes during some screen transitions in the Pokedex
-
+		; just be aware that using compression will cause ugly white flashes during some screen transitions in the Pokedex
 
 ; Using StatEXP or EVs?
 	; use 'IF DEF(MON_STAT_EXP)' to check
@@ -32,10 +38,6 @@ DEF USE_COMPRESSED_POKEDEX_GFX EQU FALSE
 
 ; Using custom Gender Ratios?
 	; see 'engine\pokedex\pokedex_stats_page.asm' Pokedex_Get_GenderRatio
-
-; Using custom Evolution Methods?
-	; NOT CURRENTLY SUPPORTED (but maybe in the future)
-	; see 'engine\pokedex\pokedex_evolution_page.asm'
 
 ; Using 'Evolution Moves'?
 ; https://github.com/pret/pokecrystal/wiki/Evolution-moves
