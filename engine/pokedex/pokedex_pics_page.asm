@@ -119,7 +119,7 @@ Pokedex_place_Mon_Icon:
 	push de
 	push hl
 
-IF (!DEF(sEnemyFrontpicTileCount) && !DEF(sPaddedEnemyFrontpic))
+IF USING_INCREASED_SPRITE_ANIMATION == FALSE
 ; sprite box border
 	hlcoord 1, 13
 	ld [hl], $70
@@ -184,10 +184,12 @@ Dex_Pics_DrawBorder:
 	ld [hli], a
 	ld a, $58 ; $3c ; text border right side of SELECT > SHINY
 	ld [hli], a
-IF (!DEF(sEnemyFrontpicTileCount) && !DEF(sPaddedEnemyFrontpic))	
+
+IF USING_INCREASED_SPRITE_ANIMATION == FALSE	
  	ld a, $34
  	ld [hli], a
  ENDC
+
  	ld a, $57 ; $3b ; text border, left side of START > CRY
 	ld [hli], a	
 	; hlcoord 10, 17
@@ -198,13 +200,15 @@ IF (!DEF(sEnemyFrontpicTileCount) && !DEF(sPaddedEnemyFrontpic))
 	inc a ; ld a, $43 ; START >
 	ld [hli], a
 	
-IF (!DEF(sEnemyFrontpicTileCount) && !DEF(sPaddedEnemyFrontpic))
+IF USING_INCREASED_SPRITE_ANIMATION == FALSE
 	ld a, $6e ; > CRY [VRAM 1] @ 15, 17
 	ld [hli], a
 	inc a ; ld a, $6f ; > CRY [VRAM 1] @ 14, 17
 	ld [hli], a
 ELSE
- ; using expanded mon animation
+; IF USING_INCREASED_SPRITE_ANIMATION == TRUE
+
+; using expanded mon animation
  	ld a, $56 ; arrow cap
  	ld [hli], a
  	ld de, cry_text
@@ -213,6 +217,7 @@ ELSE
  	inc hl
  	inc hl	
  ENDC
+
  	ld a, $58 ; $3c ; curvest text border, right side of START > CRY
  	ld [hli], a
  	ld a, $34 ; $39 ; $32 ; color block
@@ -271,7 +276,7 @@ ELSE
 	call ByteFill
 	ret
 
-IF (!DEF(sEnemyFrontpicTileCount) && !DEF(sPaddedEnemyFrontpic))
+IF USING_INCREASED_SPRITE_ANIMATION == TRUE
  cry_text:
  	db "CRY@"
  ENDC

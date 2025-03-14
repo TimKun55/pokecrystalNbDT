@@ -486,22 +486,39 @@ EVO_place_Mon_Types:
 
 ; set up the palette based on the current mon slot
 	ld a, [wBaseType1]
+
+IF SWAP_DARK_GHOST_TYPES == TRUE
+ 	call Evo_page_Swap_Dark_Ghost
+ENDC
+
 	ld c, a
-	call EVO_adjust_type_index
+	predef GetMonTypeIndex
 	ld d, c
 	ld a, [wBaseType2]
+IF SWAP_DARK_GHOST_TYPES == TRUE
+ 	call Evo_page_Swap_Dark_Ghost
+ENDC
 	ld c, a ; type 2
-	call EVO_adjust_type_index
+	predef GetMonTypeIndex
 	ld b, d
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 	call .determine_paladdr ; pal 1, 2, 3, or 4
 	farcall LoadDexTypePals
 	call SetDefaultBGPAndOBP ; call SetPalettes
 	call DelayFrame
+ENDC
 
 	ld a, [wBaseType1]
+
+IF SWAP_DARK_GHOST_TYPES == TRUE
+ 	call Evo_page_Swap_Dark_Ghost
+ENDC
+
 	ld c, a
-	call EVO_adjust_type_index
+	predef GetMonTypeIndex
 	ld a, c
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 	ld hl, TypeLightIconGFX
 	ld bc, 4 * LEN_2BPP_TILE
 	call AddNTimes
@@ -515,8 +532,11 @@ EVO_place_Mon_Types:
 	ld a, $1
 	ldh [rVBK], a
 	call Request2bpp
+ENDC
 
 	call EVO_type_gethlcoord
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 	pop af
 	ld [hli], a
 	inc a
@@ -527,16 +547,27 @@ EVO_place_Mon_Types:
 	ld [hl], a
 	ld a, $0
 	ldh [rVBK], a
+ELSE
+ ; IF USE_GEN3_STYLE_TYPE_GFX == FALSE
+ 	call DEX_EVO_NO_CUSTOM_GFX_PrintType_Short
+ENDC
+
 ; 2nd Type
 	ld a, [wBaseType1]
 	ld b, a
 	ld a, [wBaseType2]
 	cp b
 	jp z, .done
-	ld c, a ; type 2
-	call EVO_adjust_type_index
 
-	ld a, c ; type 2
+IF SWAP_DARK_GHOST_TYPES == TRUE
+ 	call Evo_page_Swap_Dark_Ghost
+ENDC
+ 
+	ld c, a ; type 2
+ 	predef GetMonTypeIndex
+ 	ld a, c ; type 2
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 ; load type 2 tiles
 	ld hl, TypeDarkIconGFX ; DexTypeDarkIconGFX
 	ld bc, 4 * LEN_2BPP_TILE
@@ -551,8 +582,11 @@ EVO_place_Mon_Types:
 	ldh [rVBK], a
 	lb bc, BANK(TypeDarkIconGFX), 4
 	call Request2bpp
-	
+ENDC
+
 	call EVO_type2_gethlcoord
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 	pop af
 	ld [hli], a
 	inc a
@@ -563,6 +597,11 @@ EVO_place_Mon_Types:
 	ld [hl], a
 	ld a, $0
 	ldh [rVBK], a
+ELSE
+ ; IF USE_GEN3_STYLE_TYPE_GFX == FALSE
+ 	call DEX_EVO_NO_CUSTOM_GFX_PrintType_Short 
+ENDC
+
 .done
 	pop af
 	ld [wCurSpecies], a
@@ -570,6 +609,8 @@ EVO_place_Mon_Types:
 	pop bc
 	pop af
 	ret
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 .determine_mon_slot1:
 	ld a, [wStatsScreenFlags]
 	ld b, $40
@@ -604,6 +645,7 @@ EVO_place_Mon_Types:
 	ld b, $5c
 	ld hl, vTiles2 tile $5c
 	ret
+
 .determine_paladdr:
 	ld a, [wStatsScreenFlags]
 	ld de, wBGPals1 palette 1 ; + 2
@@ -617,6 +659,7 @@ EVO_place_Mon_Types:
 	ret z
 	ld de, wBGPals1 palette 4 ; + 2
 	ret
+ENDC
 
 EVO_type_gethlcoord:
 	push bc
@@ -644,19 +687,6 @@ EVO_type2_gethlcoord:
 	dec hl
 	pop af
 	pop bc
-	ret
-
-EVO_adjust_type_index:
-	ld a, c
-; Skip Bird
-	cp BIRD
-	jr c, .done
-	cp UNUSED_TYPES
-	dec a
-	jr c, .done
-	sub UNUSED_TYPES
-.done
-	ld c, a
 	ret
 
 EVO_place_Mon_Icon:
@@ -950,3 +980,49 @@ EVO_Draw_border:
 	ret
 .back_page_text:
 	db $67, $68, $69, $6a, "@" ; VRAM1
+ 
+ IF SWAP_DARK_GHOST_TYPES == TRUE
+ Evo_page_Swap_Dark_Ghost:
+ 	cp GHOST
+ 	jr nz, .check_dark
+ 	ld a, DARK
+ 	jr .done
+ .check_dark
+ 	cp DARK
+ 	jr nz, .done
+ 	ld a, GHOST
+ .done
+ 	ret
+ ENDC
+ 
+ IF USE_GEN3_STYLE_TYPE_GFX == FALSE
+ DEX_EVO_NO_CUSTOM_GFX_PrintType_Short:
+ ; Print type a at hl.
+ 	push hl
+ 	ld hl, .Types
+ 	ld bc, 5 ; since each entry is 4 bytes
+ 	call AddNTimes
+ 	ld d, h
+ 	ld e, l
+ 	pop hl
+ 	jp PlaceString
+ 
+ .Types
+ 	db "NORM@"
+ 	db "FIGT@"
+ 	db "FLY @"
+ 	db "PSN @"
+ 	db "GRND@"
+ 	db "ROCK@"
+ 	db "BUG @"
+ 	db "GHST@"
+ 	db "STEL@"
+ 	db "FIRE@"
+ 	db "WATR@"
+ 	db "GRAS@"
+ 	db "ELEC@"
+ 	db "PSY @"
+ 	db "ICE @"
+ 	db "DRGN@"
+ 	db "DARK@"
+ ENDC

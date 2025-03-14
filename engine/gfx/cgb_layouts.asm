@@ -304,27 +304,65 @@ _CGB_Pokedex:
  	ld [wCurSpecies], a	
  	call GetBaseData
  	ld a, [wBaseType1]
+
+IF SWAP_DARK_GHOST_TYPES == TRUE
+ 	cp GHOST
+ 	jr nz, .check_dark
+ 	ld a, DARK
+ 	jr .done1
+ .check_dark
+ 	cp DARK
+ 	jr nz, .done1
+ 	ld a, GHOST
+ .done1
+ ENDC
+
  	ld c, a ; farcall will clobber a for the bank
 	predef GetMonTypeIndex
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
  ; load the 1st type pal 
  	; type index is already in c
  	ld de, wBGPals1 palette 7 + 2 ; slot 2 of pal 7
  	farcall LoadMonBaseTypePal	; loads type color into slot 2 of pal 7
+ENDC
+
  ; mon type 2
  	ld a, [wBaseType2]
  	ld c, a ; farcall will clobber a for the bank
 	ld a, [wBaseType1]
  	cp c
- 	jr z, .same_type
+	jr z, .same_type
+ 
+ IF SWAP_DARK_GHOST_TYPES == TRUE
+ 	ld a, c
+ 	cp GHOST
+ 	jr nz, .check_dark2
+ 	ld a, DARK
+ 	jr .done2
+ .check_dark2
+ 	cp DARK
+ 	jr nz, .done2
+ 	ld a, GHOST
+ .done2
+ 	ld c, a	
+ ENDC
+
 	predef GetMonTypeIndex
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
  ; load the 2nd type pal 
  	; type index is already in c
  	ld de, wBGPals1 palette 7 + 4 ; slot 3 of pal 7
 	farcall LoadMonBaseTypePal ; loads type color into slot 3 of pal 7
  	jr .got_palette
- .same_type
+ENDC
+
+.same_type
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
  	ld de, wBGPals1 palette 7 + 4 ; slot 3 of pal 7
  	call LoadSingleBlackPal	
+ENDC
 
 .got_palette
 	call WipeAttrmap
@@ -333,11 +371,13 @@ _CGB_Pokedex:
 	ld a, $1 ; green question mark palette
 	call FillBoxCGB
 
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
 ; mon base types
  	hlcoord 9, 4, wAttrmap
  	lb bc, 1, 8
  	ld a, 7 | VRAM_BANK_1 ; mon base type pals ; VRAM 1
  	call FillBoxCGB
+ENDC
 
 	call InitPartyMenuOBPals
 	ld hl, PokedexCursorPalette
@@ -355,17 +395,6 @@ _CGB_Pokedex:
  	ld bc, 2
  	ld a, 0 | VRAM_BANK_1 ; dex pal PREDEFPAL_POKEDEX
  	call ByteFill
- 
-; ; category box lateral sides
-; 	hlcoord 8, 5, wAttrmap
-; 	lb bc, 3, 1
-; 	ld a, 0 | VRAM_BANK_1 ; dex pal PREDEFPAL_POKEDEX
-; 	call FillBoxCGB	
- 	
-; 	hlcoord 19, 5, wAttrmap
-; 	lb bc, 2, 1
-; 	ld a, 0 | X_FLIP | VRAM_BANK_1 ; dex pal PREDEFPAL_POKEDEX
-; 	call FillBoxCGB
  
  	call ApplyAttrmap
  	call ApplyPals
@@ -392,7 +421,8 @@ _CGB_Pokedex:
  	lb bc, 16, 19
  	ld a, 0 | VRAM_BANK_1 ; VRAM 1
  	call FillBoxCGB
- 
+
+IF USE_GEN3_STYLE_TYPE_GFX == TRUE
  ; mon slot 1 types
  	hlcoord 16, 2, wAttrmap
  	lb bc, 2, 4
@@ -413,6 +443,8 @@ _CGB_Pokedex:
  	lb bc, 3, 4
  	ld a, 4 | VRAM_BANK_1 ; VRAM 1
  	call FillBoxCGB
+ENDC
+
  ; flip bottom row of sprite icon borders
  	hlcoord 1, 4, wAttrmap
  	ld bc, 4
@@ -510,7 +542,7 @@ _CGB_Pokedex_PicsPage:
  	ld a, 0 | Y_FLIP | VRAM_BANK_1
  	call ByteFill
 
-IF (!DEF(sEnemyFrontpicTileCount) && !DEF(sPaddedEnemyFrontpic))
+IF USING_INCREASED_SPRITE_ANIMATION == FALSE
 ; > CRY, set VRAM	
 	hlcoord 14, 0, wAttrmap
  	lb bc, 1, 2
