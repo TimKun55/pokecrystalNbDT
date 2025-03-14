@@ -1110,37 +1110,32 @@ Pokedex_UpdateOptionScreen:
 
 .return_to_main_screen
 	call Pokedex_BlackOutBG
-	ld a, DEXSTATE_MAIN_SCR
+	ld a, DEXSTATE_OPTION_SCR ; go back to options menu after selecting the color
+ 	; ld a, DEXSTATE_MAIN_SCR ; do not go back to options menu, go to main screen
 	ld [wJumptableIndex], a
 	ret
 
 .NoUnownModeArrowCursorData:
-	db D_UP | D_DOWN, 5
- 	dwcoord 2,  3 ; NAYRU'S DEX INFO PAGE
-	dwcoord 2,  4 ; NEW
-	dwcoord 2,  5 ; OLD
- 	dwcoord 2,  6 ; ABC
- 	dwcoord 2,  7 ; COLOR
+	db D_UP | D_DOWN, 4
+ 	dwcoord 2,  3 ; COLOR
+ 	dwcoord 2,  4 ; ABC
+ 	dwcoord 2,  5 ; NEW
+ 	dwcoord 2,  6 ; OLD
 
 .ArrowCursorData:
-	db D_UP | D_DOWN, 6
- 	dwcoord 2,  3 ; NAYRU'S DEX INFO PAGE
-	dwcoord 2,  4 ; NEW
-	dwcoord 2,  5 ; OLD
- 	dwcoord 2,  6 ; ABC
- 	dwcoord 2,  7 ; COLOR
- 	dwcoord 2,  8 ; UNOWN
+	db D_UP | D_DOWN, 5
+ 	dwcoord 2,  3 ; COLOR
+ 	dwcoord 2,  4 ; ABC
+ 	dwcoord 2,  5 ; NEW
+ 	dwcoord 2,  6 ; OLD
+ 	dwcoord 2,  7 ; UNOWN
 
 .MenuActionJumptable:
-	dw .MenuAction_NayDexInfoPage
+	dw .MenuAction_ColorOption
+ 	dw .MenuAction_ABCMode
 	dw .MenuAction_NewMode
 	dw .MenuAction_OldMode
-	dw .MenuAction_ABCMode
-	dw .MenuAction_ColorOption
 	dw .MenuAction_UnownMode
-
-.MenuAction_NayDexInfoPage
- 	ret
 
 .MenuAction_NewMode:
 	ld b, DEXMODE_NEW
@@ -1849,24 +1844,21 @@ Pokedex_DrawOptionScreenBG:
 	ld de, .Title
 	call Pokedex_PlaceString
 	hlcoord 3, 3
- 	ld de, .NayrusPokedex
+	ld de, .Color
  	call PlaceString	
  	hlcoord 3, 4	
- 	ld de, .NewMode
+	ld de, .AtoZMode
  	call PlaceString
  	hlcoord 3, 5
- 	ld de, .OldMode
+	ld de, .NewMode
  	call PlaceString
  	hlcoord 3, 6
- 	ld de, .AtoZMode
- 	call PlaceString
- 	hlcoord 3, 7
- 	ld de, .Color
+	ld de, .OldMode
 	call PlaceString
 	ld a, [wUnlockedUnownMode]
 	and a
 	ret z
-	hlcoord 3, 8
+	hlcoord 3, 7
 	ld de, .UnownMode
 	call PlaceString
 	ret
@@ -1874,9 +1866,6 @@ Pokedex_DrawOptionScreenBG:
 .Title:
 	db $3b, " OPTION ", $3c, -1
 
-.NayrusPokedex:
- 	db "#DEX INFO@"
- 
 .NewMode:
  	db "NEW #DEX MODE@"
  
@@ -2566,48 +2555,37 @@ Pokedex_DisplayModeDescription:
 	ld e, l
 	ld d, h
 	hlcoord 1, 14
-	call Pokedex_PlaceString
+	call PlaceString
 	ld a, $1
 	ldh [hBGMapMode], a
 	ret
 
 .Modes:
-	dw .NayDexInfo
+	dw .Color
+ 	dw .ABCMode
 	dw .NewMode
 	dw .OldMode
-	dw .ABCMode
-	dw .Color
 	dw .UnownMode
 
-.NayDexInfo:	
- 	db   $41, $42, $43, $56, " FULL AREA MAP", $37, $36, \
- 		 "                  ", $37, $36, \
- 		 $48, $49, $4a, $56, " TOGGLE SHINY", -1
-
 .NewMode:
-	db   "<PK><MN> are listed by  ", $37, $36, \
- 		 "                  ", $37, $36, \
- 		 "evolution type.", -1
+	db   "<PK><MN> are listed by"
+ 	next "evolution type.@"	
 
 .OldMode:
-	db   "<PK><MN> are listed by  ", $37, $36, \
- 		 "                  ", $37, $36, \
- 		 "official type.", -1
+	db   "<PK><MN> are listed by"
+ 	next "official type.@"
 
 .ABCMode:
-	db   "<PK><MN> are listed     ", $37, $36, \
- 		 "                  ", $37, $36, \
- 		 "alphabetically.", -1
+	db   "<PK><MN> are listed"
+ 	next "alphabetically.@"
  
  .Color
- 	db   "Change the color  ", $37, $36, \
- 		 "                  ", $37, $36, \
- 		 "of the border.", -1
+	db   "Change the color"
+ 	next "of the border.@"
 
 .UnownMode:
-	db   "UNOWN are listed  ", $37, $36, \
- 		 "                  ", $37, $36, \
- 		 "in catching order.", -1
+	db   "UNOWN are listed"
+ 	next "in catching order.@"
 
 Pokedex_DisplayChangingModesMessage:
 	xor a
