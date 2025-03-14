@@ -334,7 +334,7 @@ EVO_inchlcoord:
 EVO_level:
 	push hl ; pointing to lvl byte
 	call EVO_gethlcoord
-	ld [hl], $74 ; lvl icon
+	ld [hl], "<DEX_LV_VRAM1>" ; lvl icon
 
 	pop hl ; pointing to lvl byte
 	ld a, BANK("Evolutions and Attacks")
@@ -433,7 +433,7 @@ EVO_happiness:
 EVO_stats:
 	push hl ; level Needed byte
 	call EVO_gethlcoord
-	ld [hl], $75 ; for vram1 side
+	ld [hl], "<DEX_LV_VRAM1>" ; for vram1 side
 
 	pop hl ; level needed byte
 	ld a, BANK("Evolutions and Attacks")
@@ -706,11 +706,11 @@ EVO_DrawSpriteBox:
 	hlcoord 1, 1
 .start
 ; top left corner
-	ld [hl], $7a ; 2x1 corner
+	ld [hl], $7a ; 3x1 corner, VRAM1
 	push hl
 	inc hl
 ; top border
-	ld a, $79
+	ld a, $79 ; VRAM1
 	ld bc, 2
 	push hl
 	call ByteFill
@@ -718,7 +718,7 @@ EVO_DrawSpriteBox:
 ; top right corner
 	inc hl
 	inc hl	
-	ld [hl], $7b
+	ld [hl], $7b ; VRAM1
 
 	pop hl
 	ld bc, SCREEN_WIDTH
@@ -727,13 +727,13 @@ EVO_DrawSpriteBox:
 ; left side	
 	push hl
 	lb bc, 2, 1
-	ld a, $7c
+	ld a, $7c ; VRAM1
 	call FillBoxWithByte
 	pop hl
 	inc hl
 ;white sprite box fill
 	lb bc, 2, 2
-	ld a, $62 ; $7f
+	ld a, $62 ; $VRAM1
 	push hl
 	call FillBoxWithByte
 	pop hl
@@ -741,7 +741,7 @@ EVO_DrawSpriteBox:
 	inc hl
 	inc hl
 	lb bc, 2, 1
-	ld a, $7d
+	ld a, $7d ; VRAM1
 	call FillBoxWithByte
 
 ; bottom left corner
@@ -749,10 +749,10 @@ EVO_DrawSpriteBox:
 	ld bc, SCREEN_WIDTH
 	add hl, bc
 	add hl, bc
-	ld [hl], $7a
+	ld [hl], $7a ; VRAM1
 ; bottom border
 	inc hl
-	ld a, $79
+	ld a, $79 ; VRAM1
 	ld bc, 2
 	push hl
 	call ByteFill
@@ -760,7 +760,7 @@ EVO_DrawSpriteBox:
 ; bottom right corner
 	inc hl
 	inc hl
-	ld [hl], $7b
+	ld [hl], $7b ; VRAM1
 .notslot4
 	pop af
 	pop bc
@@ -866,7 +866,7 @@ EVO_place_CaughtIcon:
 .stage1
 	hlcoord 5, 1 ; 5, 2
 .start
-	ld [hl], $70 ; pokeball icon
+	ld [hl], $70 ; pokeball icon, VRAM1
 .done
 	pop af
 	pop bc
@@ -949,4 +949,4 @@ EVO_Draw_border:
 	call WaitBGMap
 	ret
 .back_page_text:
-	db $67, $68, $69, $6a, "@"
+	db $67, $68, $69, $6a, "@" ; VRAM1
