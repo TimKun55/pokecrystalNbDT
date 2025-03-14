@@ -481,7 +481,7 @@ Pokedex_ReinitDexEntryScreen:
 
 	ld a, [wPokedexEntryType]
  	cp DEXENTRY_PICS
- 	jr c, .pics
+	jr c, .not_area
  	; find first area entry or none?
  	xor a
  	ld [wPokedexEntryPageNum], a
@@ -489,7 +489,7 @@ Pokedex_ReinitDexEntryScreen:
  	ld [wPokedexEntryType], a
  	call Area_Page
  	jr .cont
- .pics
+.not_area
  	ld a, [wPokedexEntryType]
  	cp DEXENTRY_PICS
  	jr nz, .evo
@@ -609,13 +609,34 @@ DexEntryScreen_MenuActionJumptable:
  	dw Area_Page
  	dw Evos_Page
  	dw Pics_Page ; .SpriteAnim
+
+Handle_Button_Banner:
+ 	hlcoord 2, 0
+ 	ld a, [hl]
+ 	cp $41 ; first tile of START > MAP button banner
+ 	ret nz
+; overwrite the button banner
+ 	ld a, $48 ; SELECT 1
+ 	ld [hli], a
+ 	inc a ; $49, SELECT 2
+ 	ld [hli], a
+ 	inc a ; $4a, SELECT 3
+ 	ld [hli], a
+ 	ld a, $61 ; SHINY 1
+ 	ld [hli], a
+ 	inc a ; $62, SHINY 2
+ 	ld [hli], a
+ 	ld [hl], $63 ; SHINY 2
+ 	ret
  
- BaseStat_Page:
+BaseStat_Page:
+	call Handle_Button_Banner
  	call Pokedex_GetSelectedMon
  	farcall DisplayDexMonStats
  	ret
 
 Moves_Page:
+	call Handle_Button_Banner
  	call Pokedex_GetSelectedMon
  	farcall DisplayDexMonMoves
  	ld a, [wCurPartySpecies]
@@ -624,12 +645,33 @@ Moves_Page:
  	ld [wTempMonSpecies], a
  	ret
  
- Area_Page:
+Area_Page:
  	ld a, [wPrevDexEntryJumptableIndex] ; same ram as wStatsScreenFlags
  	push af
  	call Pokedex_GetSelectedMon
  	xor a
  	ldh [hBGMapMode], a
+	; print button banner based on the current category being displayed
+ 	; only print map banner when you've pressed AREA first
+; print map button banner, START > MAP
+ 	; START > $41, $42, $43
+ 	; > MAP $5e, $5f, $60
+ 	hlcoord 2, 0
+ 	ld a, [hl]
+ 	cp $48 ; first tile of SELECT > SHINY
+ 	jr nz, .button_done
+ 	ld a, $41 ; START #1
+ 	ld [hli], a
+ 	inc a ; $42, START #2
+ 	ld [hli], a
+ 	inc a ; $43, START #3
+ 	ld [hli], a
+ 	ld a, $5e ; MAP #1
+ 	ld [hli], a
+ 	inc a ; $5f, MAP #2
+ 	ld [hli], a
+ 	ld [hl], $60 ; MAP #3
+.button_done
  	farcall Pokedex_DetailedArea
  	call WaitBGMap
  	pop af
@@ -1703,24 +1745,6 @@ Pokedex_DrawDexEntryScreenBG:
  	ld [hli], a
  	ld [hl], $58 ; new curved text border, right
  
- 	; START > $41, $42, $43
- 	; > MAP $5e, $5f, $60
- 	hlcoord 9, 0
- 	ld [hl], $57 ; new curved text border, left
- 	inc hl
- 	ld a, $41 ; START #1
- 	ld [hli], a
- 	inc a ; $42, START #2
- 	ld [hli], a
- 	inc a ; $43, START #3
- 	ld [hli], a
- 	ld a, $5e ; MAP #1
- 	ld [hli], a
- 	inc a ; $5f, MAP #2
- 	ld [hli], a
- 	inc a ; $60, MAP #3
- 	ld [hli], a
- 	ld [hl], $58 ; new curved text border, right
  ; clear the row for bottom menu
 	hlcoord 1, 17
 	ld bc, SCREEN_WIDTH - 2
@@ -3291,16 +3315,16 @@ Pokedex_LoadPageNums:
  	ldh [rVBK], a
  	ld de, Pokedex_PageNumTiles tile 0
  	ld hl, vTiles2 tile $60
- 	lb bc, BANK(Pokedex_PageNumTiles), 12
+ 	lb bc, BANK(Pokedex_PageNumTiles), 16
  	call Request2bpp
- 	ld de, Pokedex_PageNumTiles tile 12
+ 	ld de, Pokedex_PageNumTiles tile 13
  	ld hl, vTiles2 tile $4e
  	lb bc, BANK(Pokedex_PageNumTiles), 1
  	call Request2bpp	
- ; single black tile at vram1 $7f
- 	ld de, Pokedex_PageNumTiles tile 15
+; ; single black tile at vram1 $7f
+ 	ld de, Pokedex_ExtraTiles tile 31
  	ld hl, vTiles2 tile $7f
- 	lb bc, BANK(Pokedex_PageNumTiles), 1
+	lb bc, BANK(Pokedex_ExtraTiles), 1
  	call Request2bpp
  	ld de, Pokedex_ExtraTiles tile 38
  	ld hl, vTiles2 tile $70
