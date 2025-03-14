@@ -912,7 +912,31 @@ Evos_Page:
  	ldh [hWX], a
  	ld a, $90
  	ldh [hWY], a
+
+IF USING_INCREASED_SPRITE_ANIMATION == FALSE
+ 	ld a, $1
+ 	ldh [rVBK], a ; Switch to VRAM 1
  
+ ; Load skinny side color border
+ 	ld de, Pokedex_ExtraTiles tile 37
+ 	ld hl, vTiles2 tile $7e ; same as EVO page
+ 	lb bc, BANK(Pokedex_ExtraTiles), 1
+ 	call Request2bpp
+ 	ld de, Pokedex_ExtraTiles tile 19
+ 	ld hl, vTiles2 tile $6e
+ 	lb bc, BANK(Pokedex_ExtraTiles), 2
+ 	call Request2bpp	
+ 
+ ; 1x1 inner corner and x1 white + x1 black vertical + horiz line
+ 	ld de, Pokedex_ExtraTiles tile 21
+ 	ld hl, vTiles2 tile $70
+ 	lb bc, BANK(Pokedex_ExtraTiles), 8
+ 	call Request2bpp
+ 	
+ 	ld a, $0
+ 	ldh [rVBK], a
+ ENDC
+
  	ld a, [wCurPartySpecies]
  	ld [wCurSpecies], a
  	ld [wTempSpecies], a

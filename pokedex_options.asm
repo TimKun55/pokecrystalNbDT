@@ -1,11 +1,13 @@
 ; using 'Increase Pokémon sprite animation size'?
 ; https://github.com/pret/pokecrystal/wiki/Increase-Pok%C3%A9mon-sprite-animation-size
-DEF USING_INCREASED_SPRITE_ANIMATION EQU TRUE
+	; NOTE this should only be enabled if you've already implemented the tutorial
+DEF USING_INCREASED_SPRITE_ANIMATION EQU FALSE
 
 
 ; using 'Expand tilesets from 192 to 255 tiles'?
 ; https://github.com/pret/pokecrystal/wiki/Expand-tilesets-from-192-to-255-tiles
-DEF USING_EXPANDED_TILESETS EQU FALSE
+	; NOTE this should only be enabled if you've already implemented the tutorial
+DEF USING_EXPANDED_TILESETS EQU TRUE
 ; NOTE if yes, make sure the math symbols, and feet & inches symbols are aligned with your charmap!
 	; see 'engine\pokedex\pokedex.asm' Pokedex_InvertTiles and Pokedex_LoadInversedFont
 
@@ -18,7 +20,7 @@ DEF USE_GEN3_STYLE_TYPE_GFX EQU TRUE
 
 ; Swap Dark and Ghost?
 ; some people dont want to use Physical Special Split, but want Dark to be Physical and Ghost to be Special
-; ensure they are swapped everywhere else they need to be, this JUST swaps them in the Pokedex
+	; ensure they are swapped everywhere else they need to be, this JUST swaps them in the Pokedex
 DEF SWAP_DARK_GHOST_TYPES EQU FALSE
 
 
