@@ -85,7 +85,7 @@ InitPokedex:
 	call ClearBGPalettes
 	call ClearSprites
 	call ClearTilemap
-	call Pokedex_LoadGFX
+	call Pokedex_LoadAllGFX
 
 	ld hl, wPokedexDataStart
 	ld bc, wPokedexDataEnd - wPokedexDataStart
@@ -690,6 +690,8 @@ Area_Page:
 	ld e, a
 	predef Pokedex_GetArea
 	call Pokedex_BlackOutBG
+	call Pokedex_LoadGFX
+ 	call Pokedex_LoadAnyFootprint
 	call DelayFrame
 	xor a
 	ldh [hBGMapMode], a
@@ -911,28 +913,6 @@ Evos_Page:
  	ld a, $90
  	ldh [hWY], a
  
- 	ld a, $1
- 	ldh [rVBK], a ; Switch to VRAM 1
- 
- ; Load skinny side color border
- 	ld de, Pokedex_ExtraTiles tile 37
- 	ld hl, vTiles2 tile $7e ; same as EVO page
- 	lb bc, BANK(Pokedex_ExtraTiles), 1
- 	call Request2bpp
- 	ld de, Pokedex_ExtraTiles tile 19
- 	ld hl, vTiles2 tile $6e
- 	lb bc, BANK(Pokedex_ExtraTiles), 2
- 	call Request2bpp	
- 
- ; 1x1 inner corner and x1 white + x1 black vertical + horiz line
- 	ld de, Pokedex_ExtraTiles tile 21
- 	ld hl, vTiles2 tile $70
- 	lb bc, BANK(Pokedex_ExtraTiles), 8
- 	call Request2bpp
- 	
- 	ld a, $0
- 	ldh [rVBK], a
- 
  	ld a, [wCurPartySpecies]
  	ld [wCurSpecies], a
  	ld [wTempSpecies], a
@@ -948,11 +928,11 @@ Evos_Page:
  
  	hlcoord 6, 11 ; 2, 11 ; 1, 9
  	call GetPokemonName
- 	call PlaceString	
- 	farcall Pokedex_PlaceBackPic
+	call PlaceString
  	xor a
  	ld [wStatsScreenFlags], a
  	farcall Pokedex_PlaceAnimatedFrontpic
+	farcall Pokedex_PlaceBackPic
  	farcall Dex_Pics_DrawBorder	
  	call WaitBGMap
  	farcall Pokedex_place_Mon_Icon
@@ -1185,7 +1165,7 @@ Pokedex_InitSearchScreen:
 	xor a
 	ldh [hBGMapMode], a
 	call ClearSprites
-	call Pokedex_LoadGFX ; restoring our precious Slowpoke Sprite
+	call Pokedex_LoadSlowpokeGFX ; restoring our precious Slowpoke Sprite
 	call Pokedex_DrawSearchScreenBG
 	call Pokedex_InitArrowCursor
 	ld a, NORMAL + 1
@@ -1395,17 +1375,8 @@ Pokedex_UpdateUnownMode:
 	ld [wJumptableIndex], a
 	call DelayFrame
 	call Pokedex_CheckSGB
-	jr nz, .decompress
+	jp nz, Pokedex_LoadGFX
 	farcall LoadSGBPokedexGFX2
-	jr .done
-
-.decompress
-	ld hl, PokedexLZ
-	ld de, vTiles2 tile $31
-	lb bc, BANK(PokedexLZ), 58
-	call DecompressRequest2bpp
-
-.done
 	ret
 
 Pokedex_UnownModeHandleDPadInput:
@@ -3266,45 +3237,56 @@ Pokedex_LoadAnyFootprint:
 	call Request1bpp
 	ret
 
-Pokedex_LoadGFX:
-	call Pokedex_LoadPageNums
+Pokedex_LoadAllGFX:
 	call DisableLCD
 	ld hl, vTiles2
 	ld bc, $31 tiles
-	xor a
+	ld a, $7f
 	call ByteFill
 
+	call Pokedex_LoadPageNums
 	call Pokedex_LoadInvertedFont
 	call LoadFontsExtra
 	ld hl, vTiles2 tile $60
 	ld bc, $20 tiles
 	call Pokedex_InvertTiles
-	call Pokedex_CheckSGB
-	jr nz, .LoadPokedexLZ
-	farcall LoadSGBPokedexGFX
-	jr .LoadPokedexSlowpokeLZ
-
-.LoadPokedexLZ:
-	ld a, BANK(PokedexLZ)
-	ld hl, PokedexLZ
-	ld de, vTiles2 tile $31
-	call FarDecompress
-
-.LoadPokedexSlowpokeLZ:
-	ld a, BANK(PokedexSlowpokeLZ)
-	ld hl, PokedexSlowpokeLZ
-	ld de, vTiles0
-	call FarDecompress
  	
  	ld hl, vTiles0 tile $3f
  	ld de, vTiles0 tile 15
  	lb bc, BANK(vTiles0), 1 ; tile
  	call Get2bpp
 
+	call Pokedex_CheckSGB
+ 	jr nz, .LoadCGBPokedex
+ 	farcall LoadSGBPokedexGFX
+ 	call .enable_lcd
+ 	jr .LoadSlowpokePokedex
+ .LoadCGBPokedex
+ 	call .enable_lcd
+ 	call Pokedex_LoadGFX
+ .LoadSlowpokePokedex
+ 	call Pokedex_LoadSlowpokeGFX
+ 	ret
+
+ .enable_lcd:
 	ld a, 6
 	call SkipMusic
 	call EnableLCD
 	ret
+
+Pokedex_LoadGFX:
+ 	ld de, PokedexGFX
+ 	ld hl, vTiles2 tile $31
+ 	lb bc, BANK(PokedexGFX), $4f
+ 	call Request2bpp
+ 	ret
+ 
+ Pokedex_LoadSlowpokeGFX:
+ 	ld de, PokedexSlowpokeGFX
+ 	ld hl, vTiles0
+ 	lb bc, BANK(PokedexSlowpokeGFX), $38
+ 	call Request2bpp
+ 	ret
 
 Pokedex_LoadPageNums:
  ; load pagenum tiles to vram1
@@ -3322,21 +3304,11 @@ Pokedex_LoadPageNums:
  	ld hl, vTiles2 tile $60
 	lb bc, BANK(Pokedex_PageNumTiles), 14
  	call Request2bpp
-; ; corner of box	
- 	; ld de, Pokedex_PageNumTiles tile 16
- 	; ld hl, vTiles2 tile $6f
- 	; lb bc, BANK(Pokedex_PageNumTiles), 1
- 	; call Request2bpp
  ; plain line
  	ld de, Pokedex_PageNumTiles tile 13
  	ld hl, vTiles2 tile $4e
  	lb bc, BANK(Pokedex_PageNumTiles), 1
 	call Request2bpp
- ; ; vertical line
- ; 	ld de, Pokedex_PageNumTiles tile 15
- ; 	ld hl, vTiles2 tile $5a
- ; 	lb bc, BANK(Pokedex_PageNumTiles), 1
- ; 	call Request2bpp	
  ; single black tile at vram1 $7f
  	ld de, Pokedex_ExtraTiles tile 31
  	ld hl, vTiles2 tile $7f
@@ -3362,16 +3334,19 @@ Pokedex_LoadPageNums:
  	ld de, FontInversed
  	ld a, BANK(FontInversed)
  	call Get1bpp
+
 	ld hl, vTiles0 tile $bb
  	lb bc, BANK(Pokedex_MathTiles), 5 ; 5 tiles
  	ld de, Pokedex_MathTiles
  	ld a, BANK(Pokedex_MathTiles)
  	call Get1bpp
+
  	ld hl, vTiles0 tile $ce
  	lb bc, BANK(Pokedex_Imperial_Tiles), 2 ; 4 tiles
  	ld de, Pokedex_Imperial_Tiles
  	ld a, BANK(Pokedex_Imperial_Tiles)
  	call Get1bpp
+
  	ld hl, vTiles0 tile $eb
  	lb bc, BANK(Pokedex_RightArrow_Tile), 1 ; 1 tiles
  	ld de, Pokedex_RightArrow_Tile
@@ -3402,6 +3377,7 @@ Pokedex_InvertTiles:
  	ld de, Pokedex_MathTiles
  	ld a, BANK(Pokedex_MathTiles)
  	call Get1bpp
+
  	ld hl, vTiles0 tile $ce
  	lb bc, BANK(Pokedex_Imperial_Tiles), 2 ; 2 tiles
  	ld de, Pokedex_Imperial_Tiles
@@ -3463,7 +3439,7 @@ _NewPokedexEntry:
 	call DisableLCD
 	call LoadStandardFont
 	call LoadFontsExtra
-	call Pokedex_LoadGFX
+	call Pokedex_LoadAllGFX
 	call Pokedex_LoadAnyFootprint
 	ld a, [wTempSpecies]
 	ld [wCurPartySpecies], a
