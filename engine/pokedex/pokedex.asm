@@ -524,26 +524,16 @@ Pokedex_ReinitDexEntryScreen:
  	; dec page, since it's auto inc'd after printing
  	ld a, [wPokedexEntryPageNum]
  	dec a
- 	ld b, a
- 	ld a, $3 ; currently max supported possible pages [4] (we have tiles for up to 9 tho)
- 	; by dec'ing the current page num, we could now have -1 (255)
- 	cp b
- 	jr nc, .basestats
-	cp $ff ; were we on the max page? would have page num turned to 0, -1 is $ff
- 	jr z, .put_max_page
- 	; so if carry flag set, we know we had been on page 4, and after printing it became 4
- 	ld b, $3 ; page index for page 4, our max page
- .basestats
- 	ld a, b
+	cp $ff ; were we on the max page? would have page num turned to 0, -1 is $ff	
+ 	jr nz, .basestats
+ 	ld a, POKEDEX_STATSPAGE_MAX_PAGE_NUM - 1 ; 3 for vanilla, 4 for EVs.
+.basestats
  	ld [wPokedexEntryPageNum], a
  	farcall DisplayDexMonStats
  	jr .cont
-.put_max_page
- 	ld b, POKEDEX_STATSPAGE_MAX_PAGE_NUM - 1 ; 3 for vanilla, 4 for EVs.
- 	jr .basestats	
- 
+
  ; if not lore or base stats, it's moves
- .moves
+.moves
  	; for moves, we can have different numbers of pages.
  	; but we can at least keep them on the first move page of the category they were in
  	; roll back category if page is 0
@@ -561,12 +551,12 @@ Pokedex_ReinitDexEntryScreen:
  	; meaning, the last actuall printed category was for the last const, DEXENTRY_MTS 
  	ld a, DEXENTRY_MTS
  	ld [wPokedexEntryType], a
- .moves_done
+.moves_done
  	xor a
  	ld [wPokedexEntryPageNum], a
  	ld [wPokedexStatus], a ; moves machines index
  	farcall DisplayDexMonMoves
- .cont
+.cont
 	call Pokedex_DrawFootprint
 	call Pokedex_LoadSelectedMonTiles
 	hlcoord 8, 1
