@@ -193,6 +193,11 @@ _CGB_PokegearPals:
 	ld a, BANK(wBGPals1)
 	call FarCopyWRAM
 
+	ld de, wBGPals1 palette 6
+ 	ld a, PREDEFPAL_POKEGEAR_TOD_ICONS
+ 	call GetPredefPal
+ 	call LoadHLPaletteIntoDE
+
 	hlcoord 18, 16, wAttrmap
  	ld bc, 1 ; 1 tile
  	ld a, 0 ; palette 0
