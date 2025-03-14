@@ -31,22 +31,26 @@ ENDC
 	call Pokedex_Get_Items ; 3 lines
 	jp DexEntry_IncPageNum
 .print_page2
+IF !DEF(wBaseHPAtkDefSpdEVs) ; handling EVs/StatExp differences
 	call Pokedex_CatchRate ; 1 line
 	call Pokedex_Get_Growth ; 1 lines
 	call Pokedex_PrintBaseExp ; 1 line
 	call Pokedex_HeightWeight ; 1 line
 	jp DexEntry_IncPageNum
-.print_page3	
-IF !DEF(wBaseHPAtkDefSpdEVs) ; handling EVs/StatExp differences
+.print_page3
 ; Vanilla: Handling EVs/StatExp differences
 	; these ones NEED to be in this order
 	call Pokedex_EggG_SetUp ; 3 lines
 	call Pokedex_PrintHatchSteps ; 1 line
 	call Pokedex_Get_GenderRatio ; 1 line
 ELSE
-; using EVs
+	call Pokedex_CatchRate ; 1 line
 	call Pokedex_PrintBaseEVs ; 4 lines
-	call Pokedex_HeightWeight ; 2 lines	
+	jp DexEntry_IncPageNum
+ .print_page3
+ 	call Pokedex_Get_Growth ; 1 lines
+ 	call Pokedex_PrintBaseExp ; 1 line
+ 	call Pokedex_HeightWeight ; 1 line
 	jp DexEntry_IncPageNum
 .print_page4
 	call Pokedex_EggG_SetUp ; 3 lines
@@ -224,10 +228,17 @@ Pokedex_Get_Items:
 	db "[ 2<%>]@"
 
 Pokedex_CatchRate:
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 2, 9
 	ld de, .BS_Catchrate
 	call PlaceString
 	hlcoord 15, 9
+ELSE ; using EVs
+ 	hlcoord 2, 14
+ 	ld de, .BS_Catchrate
+ 	call PlaceString
+ 	hlcoord 15, 14
+ ENDC
 	lb bc, PRINTNUM_LEFTALIGN | 1, 3
 	ld de, wBaseCatchRate
 	call PrintNum
@@ -238,10 +249,17 @@ Pokedex_CatchRate:
 
 Pokedex_PrintBaseExp:
 ; wBaseExp
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 2, 11
 	ld de, .Exp_text
 	call PlaceString
-	hlcoord 14, 11	
+	hlcoord 14, 11
+ ELSE
+ 	hlcoord 2, 9
+ 	ld de, .Exp_text
+ 	call PlaceString
+ 	hlcoord 14, 9
+ ENDC
 	ld de, wBaseExp
 	lb bc, 1, 3 ; 1 byte, 3 possible digits
 	call PrintNum
@@ -273,7 +291,11 @@ Pokedex_Get_Growth::
 	jr z, .Growth_print
 	ld de, .growth_slow
 .Growth_print
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 2, 13
+ELSE ; using EVs
+ 	hlcoord 2, 11
+ ENDC	
 	call PlaceString
 	ret
 
@@ -491,7 +513,7 @@ Pokedex_PrintBaseEVs:
 ; +	db (\1 << 6) | (\2 << 4) | (\3 << 2) | \4
 ; +	db (\5 << 6) | (\6 << 4)
 	ld de, .EVyield_text
-	hlcoord 3, 10
+	hlcoord 2, 9
 	call PlaceString
 	
 	ld a, $6
@@ -586,29 +608,29 @@ Pokedex_PrintBaseEVs:
 	db "EV Yield:@"
 
 .prep_stack
-	hlcoord 12, 13
+	hlcoord 11, 12
 	push hl
-	hlcoord 16, 13
+	hlcoord 15, 12
 	push hl
-	hlcoord 4, 13
+	hlcoord 3, 12
 	push hl
-	hlcoord 8, 13
+	hlcoord 7, 12
 	push hl
-	hlcoord 12, 12
+	hlcoord 11, 11
 	push hl
-	hlcoord 16, 12
+	hlcoord 15, 11
 	push hl
-	hlcoord 4, 12
+	hlcoord 3, 11
 	push hl
-	hlcoord 8, 12
+	hlcoord 7, 11
 	push hl
-	hlcoord 12, 11
+	hlcoord 11, 10
 	push hl
-	hlcoord 16, 11
+	hlcoord 15, 10
 	push hl
-	hlcoord 4, 11
+	hlcoord 3, 10
 	push hl
-	hlcoord 8, 11
+	hlcoord 7, 10
 	push hl
 	jp .start_print
 .dec_stack_count:
@@ -623,7 +645,11 @@ Pokedex_HeightWeight:
 	push bc
 	push de
 ; height string
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 2, 15
+ELSE ; using EVs
+ 	hlcoord 2, 14
+ ENDC
 	ld de, .String_HeightWeight_blank
 	call PlaceString
 
@@ -651,10 +677,18 @@ Pokedex_HeightWeight:
 	ld [wPoisonStepCount + 1], a ; weight ptr, 2 bytes
 	ld de, wPoisonStepCount ; weight ptr, 2 bytes
 ; Print the height, with two of the four digits in front of the decimal point
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 4, 15
+ELSE ; using EVs
+ 	hlcoord 4, 14
+ENDC
 	lb bc, 2, (2 << 4) | 4
 	call PrintNum
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 6, 15
+ELSE ; using EVs
+ 	hlcoord 6, 14
+ENDC
 	ld [hl], "′"
 ; get weight
 	pop af ; bank
@@ -677,21 +711,37 @@ Pokedex_HeightWeight:
 	ld a, l
 	cp $e8
 	jr c, .normal_weight
-.heavy_weight	
+.heavy_weight
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 14, 15
+ELSE ; using EVs
+ 	hlcoord 14, 14
+ENDC
 	lb bc, 2, (3 << 4) | 4
 	call PrintNum
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 17, 15
+ELSE ; using EVs
+ 	hlcoord 17, 14
+ENDC
 	ld de, .String_pounds
 	call PlaceString
 	jr .done
 ; 3 digit weight (actually 4, but we are cutting off decimal since it's always 0)
 .normal_weight	
 	; Print the weight, with 3 of the 4 digits in front of the decimal point
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 13, 15
+ELSE ; using EVs
+ 	hlcoord 13, 14
+ENDC
 	lb bc, 2, (3 << 4) | 4
 	call PrintNum
+IF !DEF(wBaseHPAtkDefSpdEVs) ; vanilla
 	hlcoord 16, 15
+ELSE ; using EVs
+ 	hlcoord 16, 14
+ENDC
 	ld de, .String_pounds
 	call PlaceString
 .done	
