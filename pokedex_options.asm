@@ -4,14 +4,6 @@
 DEF USING_INCREASED_SPRITE_ANIMATION EQU FALSE
 
 
-; using 'Expand tilesets from 192 to 255 tiles'?
-; https://github.com/pret/pokecrystal/wiki/Expand-tilesets-from-192-to-255-tiles
-	; NOTE this should only be enabled if you've already implemented the tutorial
-DEF USING_EXPANDED_TILESETS EQU TRUE
-; NOTE if yes, make sure the math symbols, and feet & inches symbols are aligned with your charmap!
-	; see 'engine\pokedex\pokedex.asm' Pokedex_InvertTiles and Pokedex_LoadInversedFont
-
-
 ; Use Rangi's Gen3 Type GFX imported from Polished Crystal?
 DEF USE_GEN3_STYLE_TYPE_GFX EQU TRUE
 	; if FALSE, use 3-letter shorthand for Types
@@ -89,3 +81,10 @@ DEF USE_COMPRESSED_POKEDEX_GFX EQU FALSE
 ; FAQ:
 ; (HINT: almost all problems will be avoided if you build your ROM hack on top of one of my Dex's branches)
 ; be sure to double check pre-requisites if you are attempting to merge manually instead of using as a base
+
+; using 'Expand tilesets from 192 to 255 tiles'?
+ 	; should be compatible by default with no additional steps required
+ ; https://github.com/pret/pokecrystal/wiki/Expand-tilesets-from-192-to-255-tiles
+ 
+ ; NOTE if yes, make sure the math symbols, and feet & inches symbols are aligned with your charmap!
+ 	; see 'engine\pokedex\pokedex.asm' Pokedex_InvertTiles and Pokedex_LoadInversedFont
